@@ -25,6 +25,10 @@
   button.ghost{background:transparent;border:1px solid var(--line);color:#333}
   .actions{display:flex;gap:12px;align-items:center}
 
+  /* Styling for Fund Options*/
+  .fund-row { display: flex; gap: 10px; align-items: center; margin-bottom: 8px; }
+  .remove-btn { background: #ff4d4d; color: white; border: none; padding: 4px 8px; cursor: pointer; border-radius: 4px; }
+  .add-btn { background: #007bff; color: white; border: none; padding: 6px 12px; cursor: pointer; border-radius: 4px; } 
 
   /* Styling for locked/copied fields */
 input[readonly] {
@@ -90,14 +94,24 @@ input[readonly] {
     </div>  
 
   <section class="section">
-       <div class="row">
-      <label style="flex:1">Withdrawal by Amount or Units 
-        <select id="ILWD_WithdrawalOption" class="persist">
-          <option value="Amount">Amount (RM)</option>
-          <option value="Units">Units</option>
-        </select>
-      </label>
-       </div>  
+ <!-- 1. Mode Selection -->
+<div class="row">
+  <label style="flex:1">Withdrawal Option:
+    <select id="ILWD_WithdrawalOption" class="persist">
+      <option value="Amount">Amount (RM)</option>
+      <option value="Units">Units</option>
+    </select>
+  </label>
+</div>
+
+<!-- 2. Dynamic Funds Container -->
+<div id="fundsContainer"></div>
+
+<!-- 3. Add Fund Action Button -->
+<div class="row">
+  <button type="button" id="addFundBtn" class="add-btn">+ Add Fund</button>
+</div>
+  </section>
 
          
 
@@ -313,6 +327,157 @@ window.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
+
+// Master list mapping funds to their corresponding PDF field IDs
+  const FUND_LIST = [
+    { key: "Managed", label: "Managed Fund", amtId: "ILWD_Managed_Amt", unitId: "ILWD_Managed_Unit" },
+    { key: "Equity", label: "Equity Fund", amtId: "ILWD_Equity_Amt", unitId: "ILWD_Equity_Unit" },
+    { key: "Income", label: "Income Fund", amtId: "ILWD_Income_Amt", unitId: "ILWD_Income_Unit" },
+    { key: "DanaEkuiti", label: "Dana Ekuiti", amtId: "ILWD_DanaEkuiti_Amt", unitId: "ILWD_DanaEkuiti_Unit" },
+    { key: "FlexiInvest", label: "FlexiInvest", amtId: "ILWD_FlexiInvest_Amt", unitId: "ILWD_FlexiInvest_Unit" },
+    { key: "China", label: "China Fund", amtId: "ILWD_China_Amt", unitId: "ILWD_China_Unit" },
+    { key: "Progress", label: "Progress Fund", amtId: "ILWD_Progress_Amt", unitId: "ILWD_Progress_Unit" },
+    { key: "Dividend", label: "Dividend Fund", amtId: "ILWD_Dividend_Amt", unitId: "ILWD_Dividend_Unit" },
+    { key: "AsiaPacReit", label: "Asia Pac REIT", amtId: "ILWD_AsiaPacReit_Amt", unitId: "ILWD_AsiaPacReit_Unit" },
+    { key: "GlobalEquity", label: "Global Equity", amtId: "ILWD_GlobalEquity_Amt", unitId: "ILWD_GlobalEquity_Unit" },
+    { key: "DanaAsia", label: "Dana Asia", amtId: "ILWD_DanaAsia_Amt", unitId: "ILWD_DanaAsia_Unit" }
+  ];
+
+  const modeSelect = document.getElementById('ILWD_WithdrawalOption');
+  const container = document.getElementById('fundsContainer');
+  const addBtn = document.getElementById('addFundBtn');
+
+  // Track currently chosen fund keys to exclude them from other dropdowns
+  let selectedFundKeys = new Set();
+
+  function createFundRow() {
+    const availableFunds = FUND_LIST.filter(f => !selectedFundKeys.has(f.key));
+    
+    if (availableFunds.length === 0) {
+      alert("All available funds have been added.");
+      return;
+    }
+
+    const mode = modeSelect.value;
+    
+    // Uses your existing .row styling directly
+    const row = document.createElement('div');
+    row.className = 'row fund-item';
+
+    // 1. Dropdown for Fund selection
+    const select = document.createElement('select');
+    select.className = 'fund-select persist';
+    select.style.flex = '1';
+    select.style.minWidth = '180px';
+
+    // 2. Value Input (Amount or Units)
+    const input = document.createElement('input');
+    input.type = 'number';
+    input.step = 'any';
+    input.placeholder = mode === 'Amount' ? 'Amount (RM)' : 'Units';
+    input.className = 'fund-input persist';
+    input.style.flex = '1';
+    input.style.minWidth = '120px';
+
+    // 3. Remove Button
+    const removeBtn = document.createElement('button');
+    removeBtn.type = 'button';
+    removeBtn.className = 'remove-btn';
+    removeBtn.textContent = '✕';
+    removeBtn.style.cursor = 'pointer';
+
+    // Set initial selection
+    let currentKey = availableFunds[0].key;
+    selectedFundKeys.add(currentKey);
+
+    // Populate initial available options
+    availableFunds.forEach(fund => {
+      const option = document.createElement('option');
+      option.value = fund.key;
+      option.textContent = fund.label;
+      select.appendChild(option);
+    });
+
+    // Handle Dropdown Change: update tracked keys and rebuild other dropdowns
+    select.addEventListener('change', (e) => {
+      selectedFundKeys.delete(currentKey);
+      currentKey = e.target.value;
+      selectedFundKeys.add(currentKey);
+      updateAllDropdowns();
+    });
+
+    // Handle Row Removal
+    removeBtn.addEventListener('click', () => {
+      selectedFundKeys.delete(currentKey);
+      row.remove();
+      updateAllDropdowns();
+    });
+
+    row.appendChild(select);
+    row.appendChild(input);
+    row.appendChild(removeBtn);
+    container.appendChild(row);
+
+    updateAllDropdowns();
+  }
+
+  // Refresh options across active dropdowns so chosen funds are hidden elsewhere
+  function updateAllDropdowns() {
+    const rows = container.querySelectorAll('.fund-item');
+    rows.forEach(row => {
+      const select = row.querySelector('.fund-select');
+      const currentVal = select.value;
+
+      select.innerHTML = '';
+
+      FUND_LIST.forEach(fund => {
+        // Keep option if currently selected in THIS dropdown OR not chosen anywhere else
+        if (fund.key === currentVal || !selectedFundKeys.has(fund.key)) {
+          const option = document.createElement('option');
+          option.value = fund.key;
+          option.textContent = fund.label;
+          if (fund.key === currentVal) option.selected = true;
+          select.appendChild(option);
+        }
+      });
+    });
+  }
+
+  // Update input placeholders dynamically when switching between Amount and Units
+  modeSelect.addEventListener('change', () => {
+    const mode = modeSelect.value;
+    const inputs = container.querySelectorAll('.fund-input');
+    inputs.forEach(input => {
+      input.placeholder = mode === 'Amount' ? 'Amount (RM)' : 'Units';
+    });
+  });
+
+  // Bind trigger & initialize default row
+  addBtn.addEventListener('click', createFundRow);
+  createFundRow();
+
+  // Helper Function: Call this when populating the PDF
+  function getPdfFormData() {
+    const mode = modeSelect.value;
+    const pdfData = {};
+    const rows = container.querySelectorAll('.fund-item');
+
+    rows.forEach(row => {
+      const fundKey = row.querySelector('.fund-select').value;
+      const val = row.querySelector('.fund-input').value;
+
+      const fundConfig = FUND_LIST.find(f => f.key === fundKey);
+      if (fundConfig && val) {
+        // Automatically picks ILWD_*_Amt or ILWD_*_Unit based on Mode
+        const fieldId = mode === 'Amount' ? fundConfig.amtId : fundConfig.unitId;
+        pdfData[fieldId] = val;
+      }
+    });
+
+    return pdfData;
+    // Returns object mapping PDF Field ID -> Value, e.g.:
+    // { "ILWD_Managed_Amt": "5000", "ILWD_Equity_Amt": "2000" }
+  }
 
 
 // AUTO FILL INSURED NAME
