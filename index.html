@@ -113,6 +113,63 @@ input[readonly] {
 </div>
   </section>
 
+   <!-- SECTION 8: E Banking -->
+  <div class="wizard-step">  
+  <section id="UserOption" class="section">
+  <h2>8. Particulars of Bank Account for Claim Payment</h2>
+
+   <div class="row">
+      <label style="flex:1">Account Holder Name<input id="ClmMed_EBank_Name" class="persist" type="text">
+      </label>
+     </div>
+
+      <div class="row">
+      <label style="flex:1">New IC/Old IC/Passport No/Co. Registration No.
+(as per bank’s records)<input id="ClmMed_EBank_NIRC" class="persist" type="text">
+      </label>
+     </div>
+
+      <div class="row">
+      <label style="flex:1">Bank Account No.<input id="ClmMed_EBank_AccNo" class="persist" type="text" placeholder="Enter no.">
+      </label>
+     </div>
+
+          <div class="row">
+  <label style="flex:1">Name of Bank
+    <select id="ClmMed_EBank_Bank" class="persist">
+      <option value="">-- Select Bank --</option>
+      <option value="Maybank">Maybank</option>
+      <option value="CIMB Bank">CIMB Bank</option>
+      <option value="Public Bank">Public Bank</option>
+      <option value="RHB Bank">RHB Bank</option>
+      <option value="Hong Leong Bank">Hong Leong Bank</option>
+      <option value="AmBank">AmBank</option>
+      <option value="UOB Bank">UOB Bank</option>
+      <option value="OCBC Bank">OCBC Bank</option>
+      <option value="HSBC Bank">HSBC Bank</option>
+      <option value="Standard Chartered">Standard Chartered</option>
+      <option value="Alliance Bank">Alliance Bank</option>
+      <option value="Affin Bank">Affin Bank</option>
+      <option value="Citibank">Citibank</option>
+      <option value="Bank Rakyat">Bank Rakyat</option>
+      <option value="Bank Islam">Bank Islam</option>
+      <option value="Bank Muamalat">Bank Muamalat</option>
+    </select>
+  </label>
+</div>
+
+    <section class="section">
+    <div class="row">
+    <label>Bank Account Type</label>  
+    </div>
+    <div class="grid-2">
+        <label class="inline"><input id="ClmMed_EBank_Conventional" class="persist"  name="Accounttype" type="radio">Conventional</label>
+        <label class="inline"><input id="ClmMed_EBank_Islamic" class="persist"  name="Accounttype" type="radio">Islamic</label>
+    </div>
+    </section>
+    
+  </section>  
+
          
 
 <section class="section">
