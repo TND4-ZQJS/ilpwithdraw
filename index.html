@@ -400,6 +400,9 @@ const FUND_LIST = [
   { key: "DanaAsia", label: "Dana Asia", amtId: "ILWD_DanaAsia_Amt", unitId: "ILWD_DanaAsia_Unit" }
 ];
 
+// Set preferred default fund for fresh entries
+const DEFAULT_FUND_KEY = "Equity";
+
 const modeSelect = document.getElementById('ILWD_WithdrawalOption');
 const container = document.getElementById('fundsContainer');
 const addBtn = document.getElementById('addFundBtn');
@@ -409,7 +412,6 @@ const STORAGE_KEY_FUNDS = 'ILWD_WithdrawalFunds_Saved';
 
 let selectedFundKeys = new Set();
 
-// Save state to localStorage
 function saveToLocalStorage() {
   localStorage.setItem(STORAGE_KEY_MODE, modeSelect.value);
 
@@ -425,7 +427,6 @@ function saveToLocalStorage() {
   localStorage.setItem(STORAGE_KEY_FUNDS, JSON.stringify(rowsData));
 }
 
-// Function to create a fund row (with optional initial value for loading)
 function createFundRow(initialFundKey = null, initialVal = '') {
   const availableFunds = FUND_LIST.filter(f => !selectedFundKeys.has(f.key));
   
@@ -461,11 +462,18 @@ function createFundRow(initialFundKey = null, initialVal = '') {
   removeBtn.textContent = '✕';
   removeBtn.style.cursor = 'pointer';
 
-  // Determine starting fund key
-  let currentKey = initialFundKey || availableFunds[0].key;
+  // Determine starting fund key:
+  // 1) Saved value (if loading from localStorage)
+  // 2) Equity Fund (if available on new row creation)
+  // 3) First remaining available fund (fallback)
+  let currentKey = initialFundKey;
+  if (!currentKey) {
+    const isEquityAvailable = availableFunds.some(f => f.key === DEFAULT_FUND_KEY);
+    currentKey = isEquityAvailable ? DEFAULT_FUND_KEY : availableFunds[0].key;
+  }
+
   selectedFundKeys.add(currentKey);
 
-  // Event listeners for auto-saving on input changes
   select.addEventListener('change', (e) => {
     selectedFundKeys.delete(currentKey);
     currentKey = e.target.value;
@@ -489,10 +497,9 @@ function createFundRow(initialFundKey = null, initialVal = '') {
   container.appendChild(row);
 
   updateAllDropdowns();
-  select.value = currentKey; // Set exact value after rendering options
+  select.value = currentKey;
 }
 
-// Rebuild dropdown option lists dynamically
 function updateAllDropdowns() {
   const rows = container.querySelectorAll('.fund-item');
   rows.forEach(row => {
@@ -513,7 +520,6 @@ function updateAllDropdowns() {
   });
 }
 
-// Mode Selection change handler
 modeSelect.addEventListener('change', () => {
   const mode = modeSelect.value;
   const inputs = container.querySelectorAll('.fund-input');
@@ -523,7 +529,6 @@ modeSelect.addEventListener('change', () => {
   saveToLocalStorage();
 });
 
-// Load saved data from localStorage on initialization
 function loadFromLocalStorage() {
   const savedMode = localStorage.getItem(STORAGE_KEY_MODE);
   if (savedMode) {
@@ -545,20 +550,18 @@ function loadFromLocalStorage() {
     }
   }
 
-  // Fallback: Default to one empty row if no saved state exists
+  // Default first entry pre-selects Equity Fund automatically
   createFundRow();
 }
 
-// Add Button trigger
 addBtn.addEventListener('click', () => {
   createFundRow();
   saveToLocalStorage();
 });
 
-// Initialize on page load
+// Initialize form
 loadFromLocalStorage();
 
-// Helper Function: Call when populating the PDF
 function getPdfFormData() {
   const mode = modeSelect.value;
   const pdfData = {};
