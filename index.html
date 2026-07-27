@@ -400,7 +400,6 @@ const FUND_LIST = [
   { key: "DanaAsia", label: "Dana Asia", amtId: "ILWD_DanaAsia_Amt", unitId: "ILWD_DanaAsia_Unit" }
 ];
 
-// Set preferred default fund for fresh entries
 const DEFAULT_FUND_KEY = "Equity";
 
 const modeSelect = document.getElementById('ILWD_WithdrawalOption');
@@ -419,9 +418,11 @@ function saveToLocalStorage() {
   const rows = container.querySelectorAll('.fund-item');
   
   rows.forEach(row => {
-    const fundKey = row.querySelector('.fund-select').value;
+    const select = row.querySelector('.fund-select');
     const val = row.querySelector('.fund-input').value;
-    rowsData.push({ fundKey, val });
+    if (select && select.value) {
+      rowsData.push({ fundKey: select.value, val });
+    }
   });
 
   localStorage.setItem(STORAGE_KEY_FUNDS, JSON.stringify(rowsData));
@@ -462,10 +463,7 @@ function createFundRow(initialFundKey = null, initialVal = '') {
   removeBtn.textContent = '✕';
   removeBtn.style.cursor = 'pointer';
 
-  // Determine starting fund key:
-  // 1) Saved value (if loading from localStorage)
-  // 2) Equity Fund (if available on new row creation)
-  // 3) First remaining available fund (fallback)
+  // Determine starting fund key
   let currentKey = initialFundKey;
   if (!currentKey) {
     const isEquityAvailable = availableFunds.some(f => f.key === DEFAULT_FUND_KEY);
@@ -474,10 +472,17 @@ function createFundRow(initialFundKey = null, initialVal = '') {
 
   selectedFundKeys.add(currentKey);
 
+  // Store active key on the element for reliable tracking during rebuilds
+  select.dataset.selectedKey = currentKey;
+
   select.addEventListener('change', (e) => {
-    selectedFundKeys.delete(currentKey);
+    const oldKey = select.dataset.selectedKey;
+    if (oldKey) selectedFundKeys.delete(oldKey);
+
     currentKey = e.target.value;
+    select.dataset.selectedKey = currentKey;
     selectedFundKeys.add(currentKey);
+
     updateAllDropdowns();
     saveToLocalStorage();
   });
@@ -485,7 +490,8 @@ function createFundRow(initialFundKey = null, initialVal = '') {
   input.addEventListener('input', saveToLocalStorage);
 
   removeBtn.addEventListener('click', () => {
-    selectedFundKeys.delete(currentKey);
+    const keyToRemove = select.dataset.selectedKey || currentKey;
+    selectedFundKeys.delete(keyToRemove);
     row.remove();
     updateAllDropdowns();
     saveToLocalStorage();
@@ -496,19 +502,25 @@ function createFundRow(initialFundKey = null, initialVal = '') {
   row.appendChild(removeBtn);
   container.appendChild(row);
 
+  // Sync options across all rows after adding to DOM
   updateAllDropdowns();
   select.value = currentKey;
 }
 
 function updateAllDropdowns() {
   const rows = container.querySelectorAll('.fund-item');
+  
   rows.forEach(row => {
     const select = row.querySelector('.fund-select');
-    const currentVal = select.value;
+    if (!select) return;
+
+    // Use dataset value to know what this specific dropdown currently holds
+    const currentVal = select.dataset.selectedKey || select.value;
 
     select.innerHTML = '';
 
     FUND_LIST.forEach(fund => {
+      // Include fund if it is currently selected in THIS dropdown OR not used anywhere else
       if (fund.key === currentVal || !selectedFundKeys.has(fund.key)) {
         const option = document.createElement('option');
         option.value = fund.key;
@@ -517,6 +529,8 @@ function updateAllDropdowns() {
         select.appendChild(option);
       }
     });
+
+    select.value = currentVal;
   });
 }
 
@@ -550,7 +564,7 @@ function loadFromLocalStorage() {
     }
   }
 
-  // Default first entry pre-selects Equity Fund automatically
+  // Fresh load default: create first row with Equity pre-selected
   createFundRow();
 }
 
@@ -568,13 +582,15 @@ function getPdfFormData() {
   const rows = container.querySelectorAll('.fund-item');
 
   rows.forEach(row => {
-    const fundKey = row.querySelector('.fund-select').value;
+    const select = row.querySelector('.fund-select');
     const val = row.querySelector('.fund-input').value;
 
-    const fundConfig = FUND_LIST.find(f => f.key === fundKey);
-    if (fundConfig && val) {
-      const fieldId = mode === 'Amount' ? fundConfig.amtId : fundConfig.unitId;
-      pdfData[fieldId] = val;
+    if (select && select.value) {
+      const fundConfig = FUND_LIST.find(f => f.key === select.value);
+      if (fundConfig && val) {
+        const fieldId = mode === 'Amount' ? fundConfig.amtId : fundConfig.unitId;
+        pdfData[fieldId] = val;
+      }
     }
   });
 
