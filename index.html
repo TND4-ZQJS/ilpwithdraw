@@ -31,15 +31,14 @@
   .add-btn { background: #007bff; color: white; border: none; padding: 6px 12px; cursor: pointer; border-radius: 4px; } 
 
   /* Styling for locked/copied fields */
-input[readonly] {
-  background: #f2f2f2;
-  color: #555;
-  cursor: not-allowed;
-  border: 1px solid #ddd; 
-  outline: none;          
-  /* Optional: slightly dim the opacity for a more 'disabled' look */
-  opacity: 0.8;
-}
+  input[readonly] {
+    background: #f2f2f2;
+    color: #555;
+    cursor: not-allowed;
+    border: 1px solid #ddd; 
+    outline: none;          
+    opacity: 0.8;
+  }
 
   /* Signature preview tiles */
   .sig-preview{
@@ -56,7 +55,6 @@ input[readonly] {
     box-shadow:0 18px 50px rgba(0,0,0,.25)
   }
   .sig-modal h3{ margin:0 0 8px 0; }
-  /* NOTE: canvas is responsive via CSS; internal pixels are set in JS for crispness */
   #sigCanvas{ width:100%; height:220px; background:#fff; border:1px solid #ddd; border-radius:10px; touch-action:none }
   .sig-actions{ display:flex; gap:10px; justify-content:flex-end; margin-top:10px; }
   
@@ -66,13 +64,13 @@ input[readonly] {
     padding:6px 10px; border-radius:8px; font-size:0.85rem; opacity:0; transition:opacity .25s;
   }
 
-  @media (max-width:900px){ .header-grid{grid-template-columns:1fr} .onetime-charge-options{grid-column: 1 / -1;} }
-  @media (max-width:720px){ .policy-grid{grid-template-columns:1fr} .card-digit{width:60px} }
+  @media (max-width:900px){ .header-grid{grid-template-columns:1fr} }
+  @media (max-width:720px){ .policy-grid{grid-template-columns:1fr} }
 </style>
 </head>
 <body>
 <main>
-  <h1>Nomination Form(LF4054)</h1>
+  <h1>Investment-linked Request Form (Fund Withdrawal)</h1>
 
 <section class="section" id="sectionA">
     <h2>Section A - Policy Details</h2>
@@ -94,158 +92,140 @@ input[readonly] {
     </div>  
 
   <section class="section">
- <!-- 1. Mode Selection -->
-<div class="row">
-  <label style="flex:1">Withdrawal Option:
-    <select id="ILWD_WithdrawalOption" class="persist">
-      <option value="Amount">Amount (RM)</option>
-      <option value="Units">Units</option>
-    </select>
-  </label>
-</div>
+    <!-- 1. Mode Selection -->
+    <div class="row">
+      <label style="flex:1">Withdrawal Option:
+        <select id="ILWD_WithdrawalOption" class="persist">
+          <option value="Amount">Amount (RM)</option>
+          <option value="Units">Units</option>
+        </select>
+      </label>
+    </div>
 
-<!-- 2. Dynamic Funds Container -->
-<div id="fundsContainer"></div>
+    <!-- 2. Dynamic Funds Container -->
+    <div id="fundsContainer"></div>
 
-<!-- 3. Add Fund Action Button -->
-<div class="row">
-  <button type="button" id="addFundBtn" class="add-btn">+ Add Fund</button>
-</div>
+    <!-- 3. Add Fund Action Button -->
+    <div class="row">
+      <button type="button" id="addFundBtn" class="add-btn">+ Add Fund</button>
+    </div>
   </section>
 
-   <!-- SECTION 8: E Banking -->
-  <div class="wizard-step">  
+   <!-- SECTION: E Banking -->
   <section id="UserOption" class="section">
-  <h2>8. Particulars of Bank Account for Claim Payment</h2>
+  <h2>Particulars of Bank Account for Claim Payment</h2>
 
    <div class="row">
       <label style="flex:1">Account Holder Name<input id="ClmMed_EBank_Name" class="persist" type="text">
       </label>
-     </div>
+   </div>
 
-      <div class="row">
-      <label style="flex:1">New IC/Old IC/Passport No/Co. Registration No.
-(as per bank’s records)<input id="ClmMed_EBank_NIRC" class="persist" type="text">
+   <div class="row">
+      <label style="flex:1">New IC/Old IC/Passport No/Co. Registration No. (as per bank’s records)
+        <input id="ClmMed_EBank_NIRC" class="persist" type="text">
       </label>
-     </div>
+   </div>
 
-      <div class="row">
-      <label style="flex:1">Bank Account No.<input id="ClmMed_EBank_AccNo" class="persist" type="text" placeholder="Enter no.">
+   <div class="row">
+      <label style="flex:1">Bank Account No.
+        <input id="ClmMed_EBank_AccNo" class="persist" type="text" placeholder="Enter no.">
       </label>
-     </div>
+   </div>
 
-          <div class="row">
-  <label style="flex:1">Name of Bank
-    <select id="ClmMed_EBank_Bank" class="persist">
-      <option value="">-- Select Bank --</option>
-      <option value="Maybank">Maybank</option>
-      <option value="CIMB Bank">CIMB Bank</option>
-      <option value="Public Bank">Public Bank</option>
-      <option value="RHB Bank">RHB Bank</option>
-      <option value="Hong Leong Bank">Hong Leong Bank</option>
-      <option value="AmBank">AmBank</option>
-      <option value="UOB Bank">UOB Bank</option>
-      <option value="OCBC Bank">OCBC Bank</option>
-      <option value="HSBC Bank">HSBC Bank</option>
-      <option value="Standard Chartered">Standard Chartered</option>
-      <option value="Alliance Bank">Alliance Bank</option>
-      <option value="Affin Bank">Affin Bank</option>
-      <option value="Citibank">Citibank</option>
-      <option value="Bank Rakyat">Bank Rakyat</option>
-      <option value="Bank Islam">Bank Islam</option>
-      <option value="Bank Muamalat">Bank Muamalat</option>
-    </select>
-  </label>
-</div>
+   <div class="row">
+      <label style="flex:1">Name of Bank
+        <select id="ClmMed_EBank_Bank" class="persist">
+          <option value="">-- Select Bank --</option>
+          <option value="Maybank">Maybank</option>
+          <option value="CIMB Bank">CIMB Bank</option>
+          <option value="Public Bank">Public Bank</option>
+          <option value="RHB Bank">RHB Bank</option>
+          <option value="Hong Leong Bank">Hong Leong Bank</option>
+          <option value="AmBank">AmBank</option>
+          <option value="UOB Bank">UOB Bank</option>
+          <option value="OCBC Bank">OCBC Bank</option>
+          <option value="HSBC Bank">HSBC Bank</option>
+          <option value="Standard Chartered">Standard Chartered</option>
+          <option value="Alliance Bank">Alliance Bank</option>
+          <option value="Affin Bank">Affin Bank</option>
+          <option value="Citibank">Citibank</option>
+          <option value="Bank Rakyat">Bank Rakyat</option>
+          <option value="Bank Islam">Bank Islam</option>
+          <option value="Bank Muamalat">Bank Muamalat</option>
+        </select>
+      </label>
+    </div>
 
     <section class="section">
-    <div class="row">
-    <label>Bank Account Type</label>  
-    </div>
-    <div class="grid-2">
-        <label class="inline"><input id="ClmMed_EBank_Conventional" class="persist"  name="Accounttype" type="radio">Conventional</label>
-        <label class="inline"><input id="ClmMed_EBank_Islamic" class="persist"  name="Accounttype" type="radio">Islamic</label>
-    </div>
+      <div class="row"><label>Bank Account Type</label></div>
+      <div class="grid-2">
+          <label class="inline"><input id="ClmMed_EBank_Conventional" class="persist" name="Accounttype" type="radio"> Conventional</label>
+          <label class="inline"><input id="ClmMed_EBank_Islamic" class="persist" name="Accounttype" type="radio"> Islamic</label>
+      </div>
     </section>
-    
   </section>  
-
-         
 
 <section class="section">
   <h2>Section E — Signature Details</h2>
 
-  <!-- SECTION: Signature Details (Date/Place) -->
-  <section class="section">
-    <h2>Signature Details</h2>
-    <div class="row">
-      <label style="flex:1">Signed at (State)
-        <select id="Nom_Nominee_SignState" class="persist">
-          <option value="">-- Select State --</option>
-          <!-- Same label set used in your reference -->
-          <option>SELANGOR</option><option>K.LUMPUR</option><option>MELAKA</option><option>JOHOR</option>
-          <option>N.SEMBILAN</option><option>PENANG</option><option>PERAK</option><option>SABAH</option>
-          <option>SARAWAK</option><option>KELANTAN</option><option>PERLIS</option><option>T'GANU</option>
-          <option>PAHANG</option><option>KEDAH</option>
-        </select>
-      </label>
-    </div>
-    <div class="row">
-      <label style="flex:1">Day
-        <select id="Nom_Nominee_SignDay" class="persist">
-          <option value="">-- Day (DD) --</option>
-          <option>01</option><option>02</option><option>03</option><option>04</option>
-          <option>05</option><option>06</option><option>07</option><option>08</option>
-          <option>09</option><option>10</option><option>11</option><option>12</option>
-          <option>13</option><option>14</option><option>15</option><option>16</option>
-          <option>17</option><option>18</option><option>19</option><option>20</option>
-          <option>21</option><option>22</option><option>23</option><option>24</option>
-          <option>25</option><option>26</option><option>27</option><option>28</option>
-          <option>29</option><option>30</option><option>31</option>
-        </select>
-      </label>
-      <label style="flex:1">Month
-        <select id="Nom_Nominee_SignMonth" class="persist">
-          <option value="">-- Month --</option>
-          <option>JANUARY</option><option>FEBRUARY</option><option>MARCH</option><option>APRIL</option>
-          <option>MAY</option><option>JUNE</option><option>JULY</option><option>AUGUST</option>
-          <option>SEPTEMBER</option><option>OCTOBER</option><option>NOVEMBER</option><option>DECEMBER</option>
-        </select>
-      </label>
-      <label style="flex:1">Year
-        <select id="Nom_Nominee_SignYear" class="persist">
-          <option value="">-- Year (YYYY) --</option>
-          <option>2025</option><option>2026</option>
-        </select>
-      </label>
-    </div>
-  </section>
-
-  <!-- SECTION: Owner/Policyowner Signature -->
-  <section class="section">
-  <h3>Policy Owner Signature</h3>
-
   <div class="row">
-      <label>
-      <input type="checkbox" id="same_as_insured"> Policyowner is same as Insured
-      </label>
-    </div>
-    
+    <label style="flex:1">Signed at (State)
+      <select id="Nom_Nominee_SignState" class="persist">
+        <option value="">-- Select State --</option>
+        <option>SELANGOR</option><option>K.LUMPUR</option><option>MELAKA</option><option>JOHOR</option>
+        <option>N.SEMBILAN</option><option>PENANG</option><option>PERAK</option><option>SABAH</option>
+        <option>SARAWAK</option><option>KELANTAN</option><option>PERLIS</option><option>T'GANU</option>
+        <option>PAHANG</option><option>KEDAH</option>
+      </select>
+    </label>
+  </div>
+  <div class="row">
+    <label style="flex:1">Day
+      <select id="Nom_Nominee_SignDay" class="persist">
+        <option value="">-- Day (DD) --</option>
+        <option>01</option><option>02</option><option>03</option><option>04</option>
+        <option>05</option><option>06</option><option>07</option><option>08</option>
+        <option>09</option><option>10</option><option>11</option><option>12</option>
+        <option>13</option><option>14</option><option>15</option><option>16</option>
+        <option>17</option><option>18</option><option>19</option><option>20</option>
+        <option>21</option><option>22</option><option>23</option><option>24</option>
+        <option>25</option><option>26</option><option>27</option><option>28</option>
+        <option>29</option><option>30</option><option>31</option>
+      </select>
+    </label>
+    <label style="flex:1">Month
+      <select id="Nom_Nominee_SignMonth" class="persist">
+        <option value="">-- Month --</option>
+        <option>JANUARY</option><option>FEBRUARY</option><option>MARCH</option><option>APRIL</option>
+        <option>MAY</option><option>JUNE</option><option>JULY</option><option>AUGUST</option>
+        <option>SEPTEMBER</option><option>OCTOBER</option><option>NOVEMBER</option><option>DECEMBER</option>
+      </select>
+    </label>
+    <label style="flex:1">Year
+      <select id="Nom_Nominee_SignYear" class="persist">
+        <option value="">-- Year (YYYY) --</option>
+        <option>2025</option><option>2026</option>
+      </select>
+    </label>
+  </div>
+
   <!-- SECTION: Policy Owner Signature -->
   <section class="section" data-sig-role="owner" data-sig-title="Sign: Policy Owner">
     <h3>Policy Owner Signature</h3>
     <div class="row">
+      <label><input type="checkbox" id="same_as_insured"> Policyowner is same as Insured</label>
+    </div>
+    <div class="row">
       <label style="flex:1">Policy Owner's Name
-        <input id="Nom_Nominee_PolicyOwner_Name" type="text">
+        <input id="Nom_Nominee_PolicyOwner_Name" type="text" class="persist">
       </label>
     </div>
     <div class="row">
       <label style="flex:1">NIRC/Passport No.
-        <input id="Nom_Nominee_PolicyOwner_NRIC" type="text">
+        <input id="Nom_Nominee_PolicyOwner_NRIC" type="text" class="persist">
       </label>
     </div>
 
-    <!-- Tap-to-sign previews (Owner) -->
     <div class="sig-preview" data-sig-preview>
       <span>Tap to Sign (Policy Owner)</span>
     </div>
@@ -259,19 +239,18 @@ input[readonly] {
     <h3>Witness Signature</h3>
     <div class="row">
       <label style="flex:1">Witness' Name
-        <input id="Nom_Nominee_Witness_Name" type="text">
+        <input id="Nom_Nominee_Witness_Name" type="text" class="persist">
       </label>
     </div>
     <div class="row">
       <label style="flex:1">NIRC/Passport No.
-        <input id="Nom_Nominee_Witness_NIRC" type="text">
+        <input id="Nom_Nominee_Witness_NIRC" type="text" class="persist">
       </label>
       <label style="flex:1">Mobile
-        <input id="Nom_Nominee_Witness_Mobile" type="text">
+        <input id="Nom_Nominee_Witness_Mobile" type="text" class="persist">
       </label>
     </div>
 
-    <!-- Tap-to-sign previews (Witness) -->
     <div class="sig-preview" data-sig-preview>
       <span>Tap to Sign (Witness)</span>
     </div>  
@@ -285,16 +264,15 @@ input[readonly] {
     <h3>Trustee Signature</h3>
     <div class="row">
       <label style="flex:1">Trustee's Name
-        <input id="Nom_Nominee_Trustee_Name" type="text">
+        <input id="Nom_Nominee_Trustee_Name" type="text" class="persist">
       </label>
     </div>
     <div class="row">
       <label style="flex:1">NIRC/Passport No.
-        <input id="Nom_Nominee_Trustee_NIRC" type="text">
+        <input id="Nom_Nominee_Trustee_NIRC" type="text" class="persist">
       </label>
     </div>
 
-    <!-- Tap-to-sign previews (Trustee) -->
     <div class="sig-preview" data-sig-preview>
       <span>Tap to Sign (Trustee)</span>
     </div>  
@@ -304,17 +282,16 @@ input[readonly] {
   </section>
 
   <section class="section actions">
-    <button id="generate">Generate PDF</button>
-    <button id="resetAll" class="secondary">Reset All</button>
+    <button id="generate" type="button">Generate PDF</button>
+    <button id="resetAll" type="button" class="secondary">Reset All</button>
   </section>
-
+</section>
 </main>
 
 <!-- Signature Modal -->
-<div id="sigModal" class="sig-modal" aria-hidden="true" style="display:none;">
+<div id="sigModal" class="sig-modal" aria-hidden="true">
   <div class="box">
     <h3 id="sigModalTitle">Draw Signature</h3>
-    <!-- Responsive canvas wrapper -->
     <div class="canvas-wrapper">
       <canvas id="sigCanvas"></canvas>
     </div>
@@ -326,7 +303,6 @@ input[readonly] {
   </div>
 </div>
 
-
 <div id="saveStatus">Saved</div>
 
 <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
@@ -334,24 +310,26 @@ input[readonly] {
 <script>
 /* ---------- CONFIG ---------- */
 const PDF_FILENAME = "Nomination and Trustees_LF4056_LF4054_fillable.pdf";
-const MAX_NOMINEES = 5;
+const FORM_ID = "ilpwd";
 
-/* ---------- helpers ---------- */
-function $(id){return document.getElementById(id);}
+/* ---------- DOM Helpers ---------- */
+const $ = (id) => document.getElementById(id);
+
 function safeSetText(form, name, text){
-  try{ form.getTextField(name).setText(String(text || "")); } catch(e){ /* missing field ok */ }
+  try{ form.getTextField(name).setText(String(text || "")); } catch(e){ }
 }
 function safeCheck(form, name, checked){
-  try{ const cb = form.getCheckBox(name); if (checked) cb.check(); else cb.uncheck(); } catch(e){ /* missing field ok */ }
+  try{ const cb = form.getCheckBox(name); if (checked) cb.check(); else cb.uncheck(); } catch(e){ }
 }
 
-/* ----------Universal Save indicator ---------- */
+/* ---------- Save Indicator & Persistence ---------- */
 const saveStatusEl = $("saveStatus");
 function showSaveStatus(){
-  saveStatusEl.style.opacity = 1;
+  saveStatusEl.style.opacity = '1';
   clearTimeout(saveStatusEl._timer);
-  saveStatusEl._timer = setTimeout(()=> saveStatusEl.style.opacity = 0, 1200);
+  saveStatusEl._timer = setTimeout(()=> saveStatusEl.style.opacity = '0', 1200);
 }
+
 function saveElValue(el){
   if(!el || !el.id) return;
   if(el.type === 'checkbox' || el.type === 'radio'){
@@ -361,6 +339,7 @@ function saveElValue(el){
   }
   showSaveStatus();
 }
+
 function autoBindSave(el){
   const saved = localStorage.getItem(el.id);
   if(saved !== null){
@@ -370,29 +349,28 @@ function autoBindSave(el){
   el.addEventListener((el.type === 'checkbox' || el.type === 'radio') ? 'change' : 'input', ()=> saveElValue(el));
 }
 
-/* ---------- Universal AutoBind Save + Uppercase ---------- */
 window.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll("input, select, textarea").forEach(el => {
-    if (!el.id) return; // skip if no ID
-
-    // Restore + bind saving
+    if (!el.id) return;
     autoBindSave(el);
 
-    // Auto-uppercase rule (exclude Email)
     if (el.type === "text" || el.tagName === "TEXTAREA") {
       if (!el.id.toLowerCase().includes("email")) {
         el.addEventListener("input", () => {
           const cursor = el.selectionStart;
           el.value = el.value.toUpperCase();
-          el.setSelectionRange(cursor, cursor); // keep caret
-          saveElValue(el); // ensure saved after transform
+          el.setSelectionRange(cursor, cursor);
+          saveElValue(el);
         });
       }
     }
   });
+
+  initSignatureFields();
+  loadFromLocalStorage();
 });
 
-// Master list mapping funds to their corresponding PDF field IDs
+/* ---------- Fund List Logic ---------- */
 const FUND_LIST = [
   { key: "Managed", label: "Managed Fund", amtId: "ILWD_Managed_Amt", unitId: "ILWD_Managed_Unit" },
   { key: "Equity", label: "Equity Fund", amtId: "ILWD_Equity_Amt", unitId: "ILWD_Equity_Unit" },
@@ -408,55 +386,31 @@ const FUND_LIST = [
 ];
 
 const DEFAULT_FUND_KEY = "Equity";
-
-const modeSelect = document.getElementById('ILWD_WithdrawalOption');
-const container = document.getElementById('fundsContainer');
-const addBtn = document.getElementById('addFundBtn');
+const modeSelect = $("ILWD_WithdrawalOption");
+const container = $("fundsContainer");
+const addBtn = $("addFundBtn");
 
 const STORAGE_KEY_MODE = 'ILWD_WithdrawalOption_Saved';
 const STORAGE_KEY_FUNDS = 'ILWD_WithdrawalFunds_Saved';
 
 let selectedFundKeys = new Set();
 
-// Function to notify your global form-filler system that data was saved
-function notifySave(element) {
-  // 1. Save local state for dynamic rows
-  saveToLocalStorage();
-
-  // 2. Dispatch a bubbled change event so global .persist handlers pick it up
-  if (element) {
-    element.dispatchEvent(new Event('change', { bubbles: true }));
-    element.dispatchEvent(new Event('input', { bubbles: true }));
-  }
-
-  // 3. If your application has a global save function (e.g., saveFormData or updateSaveStatus), call it
-  if (typeof window.saveFormData === 'function') {
-    window.saveFormData();
-  } else if (typeof window.save === 'function') {
-    window.save();
-  }
-}
-
 function saveToLocalStorage() {
   localStorage.setItem(STORAGE_KEY_MODE, modeSelect.value);
-
   const rowsData = [];
-  const rows = container.querySelectorAll('.fund-item');
-  
-  rows.forEach(row => {
+  container.querySelectorAll('.fund-item').forEach(row => {
     const select = row.querySelector('.fund-select');
     const val = row.querySelector('.fund-input').value;
     if (select && select.value) {
       rowsData.push({ fundKey: select.value, val });
     }
   });
-
   localStorage.setItem(STORAGE_KEY_FUNDS, JSON.stringify(rowsData));
+  showSaveStatus();
 }
 
 function createFundRow(initialFundKey = null, initialVal = '') {
   const availableFunds = FUND_LIST.filter(f => !selectedFundKeys.has(f.key));
-  
   if (!initialFundKey && availableFunds.length === 0) {
     alert("All available funds have been added.");
     return;
@@ -466,61 +420,44 @@ function createFundRow(initialFundKey = null, initialVal = '') {
   const row = document.createElement('div');
   row.className = 'row fund-item';
 
-  // 1. Dropdown
   const select = document.createElement('select');
-  select.className = 'fund-select persist';
+  select.className = 'fund-select';
   select.style.flex = '1';
-  select.style.minWidth = '180px';
 
-  // 2. Value Input
   const input = document.createElement('input');
   input.type = 'number';
   input.step = 'any';
   input.value = initialVal;
   input.placeholder = mode === 'Amount' ? 'Amount (RM)' : 'Units';
-  input.className = 'fund-input persist';
+  input.className = 'fund-input';
   input.style.flex = '1';
-  input.style.minWidth = '120px';
 
-  // 3. Remove Button
   const removeBtn = document.createElement('button');
   removeBtn.type = 'button';
   removeBtn.className = 'remove-btn';
   removeBtn.textContent = '✕';
-  removeBtn.style.cursor = 'pointer';
 
-  // Determine starting fund key
-  let currentKey = initialFundKey;
-  if (!currentKey) {
-    const isEquityAvailable = availableFunds.some(f => f.key === DEFAULT_FUND_KEY);
-    currentKey = isEquityAvailable ? DEFAULT_FUND_KEY : availableFunds[0].key;
-  }
+  let currentKey = initialFundKey || (availableFunds.some(f => f.key === DEFAULT_FUND_KEY) ? DEFAULT_FUND_KEY : availableFunds[0].key);
 
   selectedFundKeys.add(currentKey);
   select.dataset.selectedKey = currentKey;
 
   select.addEventListener('change', (e) => {
-    const oldKey = select.dataset.selectedKey;
-    if (oldKey) selectedFundKeys.delete(oldKey);
-
+    selectedFundKeys.delete(select.dataset.selectedKey);
     currentKey = e.target.value;
     select.dataset.selectedKey = currentKey;
     selectedFundKeys.add(currentKey);
-
     updateAllDropdowns();
-    notifySave(select);
+    saveToLocalStorage();
   });
 
-  input.addEventListener('input', () => {
-    notifySave(input);
-  });
+  input.addEventListener('input', saveToLocalStorage);
 
   removeBtn.addEventListener('click', () => {
-    const keyToRemove = select.dataset.selectedKey || currentKey;
-    selectedFundKeys.delete(keyToRemove);
+    selectedFundKeys.delete(select.dataset.selectedKey);
     row.remove();
     updateAllDropdowns();
-    notifySave(container);
+    saveToLocalStorage();
   });
 
   row.appendChild(select);
@@ -533,15 +470,11 @@ function createFundRow(initialFundKey = null, initialVal = '') {
 }
 
 function updateAllDropdowns() {
-  const rows = container.querySelectorAll('.fund-item');
-  
-  rows.forEach(row => {
+  container.querySelectorAll('.fund-item').forEach(row => {
     const select = row.querySelector('.fund-select');
     if (!select) return;
-
     const currentVal = select.dataset.selectedKey || select.value;
     select.innerHTML = '';
-
     FUND_LIST.forEach(fund => {
       if (fund.key === currentVal || !selectedFundKeys.has(fund.key)) {
         const option = document.createElement('option');
@@ -551,78 +484,60 @@ function updateAllDropdowns() {
         select.appendChild(option);
       }
     });
-
     select.value = currentVal;
   });
 }
 
 modeSelect.addEventListener('change', () => {
   const mode = modeSelect.value;
-  const inputs = container.querySelectorAll('.fund-input');
-  inputs.forEach(input => {
+  container.querySelectorAll('.fund-input').forEach(input => {
     input.placeholder = mode === 'Amount' ? 'Amount (RM)' : 'Units';
   });
-  notifySave(modeSelect);
+  saveToLocalStorage();
 });
 
 function loadFromLocalStorage() {
   const savedMode = localStorage.getItem(STORAGE_KEY_MODE);
-  if (savedMode) {
-    modeSelect.value = savedMode;
-  }
+  if (savedMode) modeSelect.value = savedMode;
 
   const savedFundsRaw = localStorage.getItem(STORAGE_KEY_FUNDS);
   if (savedFundsRaw) {
     try {
       const savedFunds = JSON.parse(savedFundsRaw);
       if (Array.isArray(savedFunds) && savedFunds.length > 0) {
-        savedFunds.forEach(item => {
-          createFundRow(item.fundKey, item.val);
-        });
+        savedFunds.forEach(item => createFundRow(item.fundKey, item.val));
         return;
       }
-    } catch (e) {
-      console.error("Failed to parse saved funds from localStorage", e);
-    }
+    } catch (e) { console.error(e); }
   }
-
   createFundRow();
 }
 
 addBtn.addEventListener('click', () => {
   createFundRow();
-  notifySave(addBtn);
+  saveToLocalStorage();
 });
-
-// Initialize form on load
-loadFromLocalStorage();
 
 function getPdfFormData() {
   const mode = modeSelect.value;
   const pdfData = {};
-  const rows = container.querySelectorAll('.fund-item');
-
-  rows.forEach(row => {
+  container.querySelectorAll('.fund-item').forEach(row => {
     const select = row.querySelector('.fund-select');
     const val = row.querySelector('.fund-input').value;
-
-    if (select && select.value) {
+    if (select && select.value && val) {
       const fundConfig = FUND_LIST.find(f => f.key === select.value);
-      if (fundConfig && val) {
-        const fieldId = mode === 'Amount' ? fundConfig.amtId : fundConfig.unitId;
-        pdfData[fieldId] = val;
+      if (fundConfig) {
+        pdfData[mode === 'Amount' ? fundConfig.amtId : fundConfig.unitId] = val;
       }
     }
   });
-
   return pdfData;
 }
 
-
-// AUTO FILL INSURED NAME
-document.getElementById('same_as_insured').addEventListener('change', function() {
-    const insuredName = document.getElementById('Nom_InsuredName');
-    const poName = document.getElementById('Nom_Nominee_PolicyOwner_Name');
+/* ---------- Auto-Fill Insured Name ---------- */
+$("same_as_insured").addEventListener('change', function() {
+    const insuredName = $("ILWD_Insured");
+    const poName = $("Nom_Nominee_PolicyOwner_Name");
 
     if (this.checked) {
         poName.value = insuredName.value;
@@ -631,28 +546,15 @@ document.getElementById('same_as_insured').addEventListener('change', function()
         poName.value = "";
         poName.readOnly = false;
     }
-
-    // Force the persistence script to save the changes (even the cleared ones)
     poName.dispatchEvent(new Event('input', { bubbles: true }));
 });
 
-  
-/* ==========================================================================
-   PAGE SCOPE CONFIGURATION
-   ========================================================================== */
-const FORM_ID = "ilpwd"; // Unique key prefix per form
-
-/* ==========================================================================
-   1. SIGNATURE MODAL & SIGNATURE_PAD ENGINE
-   ========================================================================== */
-const $ = (id) => document.getElementById(id);
-
+/* ---------- Signature Engine ---------- */
 let sigTarget = null;
 const sigModal = $("sigModal");
 const sigCanvas = $("sigCanvas");
 const sigCtx = sigCanvas.getContext("2d");
 
-// Initialize SignaturePad Library
 const signaturePad = new SignaturePad(sigCanvas, {
   minWidth: 0.7,
   maxWidth: 2.5,
@@ -660,7 +562,6 @@ const signaturePad = new SignaturePad(sigCanvas, {
   backgroundColor: "rgba(0,0,0,0)"
 });
 
-// Resize canvas handling HiDPI displays + restoring existing drawing
 function resizeCanvas() {
   const ratio = Math.max(window.devicePixelRatio || 1, 1);
   const storageKey = sigTarget ? `sig_${FORM_ID}_${sigTarget}` : null;
@@ -670,30 +571,21 @@ function resizeCanvas() {
   sigCanvas.height = sigCanvas.offsetHeight * ratio;
   sigCtx.setTransform(ratio, 0, 0, ratio, 0, 0);
 
-  signaturePad.clear(); // Clear internal pad state
+  signaturePad.clear();
 
   if (savedFromStorage) {
     const img = new Image();
-    img.onload = () => {
-      sigCtx.drawImage(img, 0, 0, sigCanvas.offsetWidth, sigCanvas.offsetHeight);
-    };
+    img.onload = () => sigCtx.drawImage(img, 0, 0, sigCanvas.offsetWidth, sigCanvas.offsetHeight);
     img.src = savedFromStorage;
   }
 }
 
 function openSig({ role, title }) {
   sigTarget = role;
-  
-  if ($("sigModalTitle")) {
-    $("sigModalTitle").textContent = title || `Sign: ${role}`;
-  }
-
+  if ($("sigModalTitle")) $("sigModalTitle").textContent = title || `Sign: ${role}`;
   sigModal.style.display = "block";
   sigModal.setAttribute("aria-hidden", "false");
-
-  requestAnimationFrame(() => {
-    resizeCanvas();
-  });
+  requestAnimationFrame(resizeCanvas);
 }
 
 function closeSigModal() {
@@ -702,73 +594,45 @@ function closeSigModal() {
   sigTarget = null;
 }
 
-// Modal Event Listeners
 $("sigDone")?.addEventListener("click", () => {
-  if (!sigTarget) return;
-
-  if (signaturePad.isEmpty()) {
-    alert("Please provide a signature first.");
-    return;
-  }
+  if (!sigTarget || signaturePad.isEmpty()) return;
 
   const dataURL = sigCanvas.toDataURL("image/png");
   localStorage.setItem(`sig_${FORM_ID}_${sigTarget}`, dataURL);
   
-  // Find preview container for current role
   const block = document.querySelector(`[data-sig-role="${sigTarget}"]`);
   const previewDiv = block?.querySelector("[data-sig-preview]");
   if (previewDiv) {
     previewDiv.innerHTML = `<img src="${dataURL}" style="max-height:100%; width:auto;" alt="Signature ${sigTarget}">`;
   }
-
   closeSigModal();
 });
 
-$("sigClear")?.addEventListener("click", () => {
-  signaturePad.clear();
-});
-
+$("sigClear")?.addEventListener("click", () => signaturePad.clear());
 $("sigCancel")?.addEventListener("click", closeSigModal);
 window.addEventListener("resize", resizeCanvas);
 
-
-/* ==========================================================================
-   2. DOM BINDING AUTOMATION
-   ========================================================================== */
 function initSignatureFields() {
-  const blocks = document.querySelectorAll("[data-sig-role]");
-
-  blocks.forEach((block) => {
+  document.querySelectorAll("[data-sig-role]").forEach((block) => {
     const role = block.dataset.sigRole;
     const title = block.dataset.sigTitle || `Sign: ${role}`;
     const previewEl = block.querySelector("[data-sig-preview]");
     const clearBtn = block.querySelector("[data-sig-clear]");
-    const defaultHtml = previewEl ? previewEl.innerHTML : "";
+    const defaultText = `<span>Tap to Sign (${role.charAt(0).toUpperCase() + role.slice(1)})</span>`;
 
-    // Open modal on click
-    previewEl?.addEventListener("click", () => {
-      openSig({ role, title });
-    });
+    previewEl?.addEventListener("click", () => openSig({ role, title }));
 
-    // Clear signature button on form
     clearBtn?.addEventListener("click", () => {
       localStorage.removeItem(`sig_${FORM_ID}_${role}`);
-      if (previewEl) previewEl.innerHTML = defaultHtml;
+      if (previewEl) previewEl.innerHTML = defaultText;
     });
 
-    // Load saved signature on page load
     const saved = localStorage.getItem(`sig_${FORM_ID}_${role}`);
     if (saved && previewEl) {
       previewEl.innerHTML = `<img src="${saved}" style="max-height:100%; width:auto;" alt="Signature ${role}">`;
     }
   });
 }
-
-document.addEventListener("DOMContentLoaded", () => {
-  initSignatureFields();
-});
-
-
 
 /* ---------- Generate PDF ---------- */
 async function fillPDF(){
@@ -781,115 +645,61 @@ async function fillPDF(){
     const pdfDoc = await PDFLib.PDFDocument.load(bytes);
     const form = pdfDoc.getForm();
 
-   // Section A - Policy Details FillPDF
-  safeSetText(form, "Nom_PolicyNumber", $("Nom_PolicyNumber").value);
-  safeSetText(form, "Nom_InsuredName", $("Nom_InsuredName").value);
+    // Section A Policy Details
+    safeSetText(form, "ILWD_PolicyNo", $("ILWD_PolicyNo").value);
+    safeSetText(form, "ILWD_Insured", $("ILWD_Insured").value);
+    safeSetText(form, "ILWD_Reason", $("ILWD_Reason").value);
 
-  safeCheck(form, "Nom_MaritalStatus_Single", $("Nom_MaritalStatus_Single").checked);
-  safeCheck(form, "Nom_MaritalStatus_Married", $("Nom_MaritalStatus_Married").checked);
-  safeCheck(form, "Nom_MaritalStatus_Widowed", $("Nom_MaritalStatus_Widowed").checked);
-  safeCheck(form, "Nom_MaritalStatus_Divorced", $("Nom_MaritalStatus_Divorced").checked);
-
-  safeCheck(form, "Nom_Religion_Muslim", $("Nom_Religion_Muslim").checked);
-  safeCheck(form, "Nom_Religion_NonMuslim", $("Nom_Religion_NonMuslim").checked);
-
-  safeCheck(form, "Nom_MaritalStatus_Single", $("Nom_MaritalStatus_Single").checked);
-  safeCheck(form, "Nom_MaritalStatus_Married", $("Nom_MaritalStatus_Married").checked);
-  safeCheck(form, "Nom_MaritalStatus_Widowed", $("Nom_MaritalStatus_Widowed").checked);
-  safeCheck(form, "Nom_MaritalStatus_Divorced", $("Nom_MaritalStatus_Divorced").checked);
-
-  safeCheck(form, "Nom_Religion_Muslim", $("Nom_Religion_Muslim").checked);
-  safeCheck(form, "Nom_Religion_NonMuslim", $("Nom_Religion_NonMuslim").checked);
-
-
-  // Section C - Signing Details - FillPDF 
-  safeSetText(form, "Nom_Nominee_SignState", $("Nom_Nominee_SignState").value);
-  safeSetText(form, "Nom_Nominee_SignDay", $("Nom_Nominee_SignDay").value);
-  safeSetText(form, "Nom_Nominee_SignMonth", $("Nom_Nominee_SignMonth").value);
-  safeSetText(form, "Nom_Nominee_SignYear", $("Nom_Nominee_SignYear").value);
-
-  safeSetText(form, "Nom_Nominee_PolicyOwner_Name", $("Nom_Nominee_PolicyOwner_Name").value);
-  safeSetText(form, "Nom_Nominee_PolicyOwner_NRIC", $("Nom_Nominee_PolicyOwner_NRIC").value);
-  safeSetText(form, "Nom_Nominee_Trustee_Name", $("Nom_Nominee_Trustee_Name").value);
-  safeSetText(form, "Nom_Nominee_Trustee_NIRC", $("Nom_Nominee_Trustee_NIRC").value);
-
-  safeSetText(form, "Nom_Nominee_Witness_Name", $("Nom_Nominee_Witness_Name").value);
-  safeSetText(form, "Nom_Nominee_Witness_NIRC", $("Nom_Nominee_Witness_NIRC").value);
-  safeSetText(form, "Nom_Nominee_Witness_Mobile", $("Nom_Nominee_Witness_Mobile").value);
-
-
-   /* ---------- SIGNATURE IMAGE EMBEDDING ENGINE ---------- */
-
-// Helper function to embed any role's signature onto a PDF page
-async function embedSignatureToPdf(pdfDoc, pageIndex, { role, x, y, factor = 0.40 }) {
-  // Pull signature dynamically using current FORM_ID and role
-  const sigData = localStorage.getItem(`sig_${FORM_ID}_${role}`);
-  if (!sigData) return;
-
-  try {
-    const pages = pdfDoc.getPages();
-    const targetPage = pages[Math.min(pageIndex, pages.length - 1)];
-
-    const img = await pdfDoc.embedPng(sigData);
-    const { width, height } = img.size();
-
-    // Query element by attribute instead of hardcoded ID
-    const previewEl = document.querySelector(`[data-sig-role="${role}"] [data-sig-preview]`);
-    const boxW = previewEl?.offsetWidth || 150;
-    const boxH = previewEl?.offsetHeight || 50;
-
-    const scale = Math.min(boxW / width, boxH / height);
-    const drawW = width * scale * factor;
-    const drawH = height * scale * factor;
-
-    targetPage.drawImage(img, {
-      x,
-      y,
-      width: drawW,
-      height: drawH
+    // Dynamic Fund Details mapping
+    const fundData = getPdfFormData();
+    Object.keys(fundData).forEach(fieldId => {
+      safeSetText(form, fieldId, fundData[fieldId]);
     });
-  } catch (err) {
-    console.error(`Failed to embed signature for role "${role}":`, err);
-  }
-}
 
-/* ---------- EMBED SIGNATURES IN YOUR GENERATE FUNCTION ---------- */
-// Call this inside your PDF generation function (e.g., generateAndFillPDF)
+    // E-Banking details
+    safeSetText(form, "ClmMed_EBank_Name", $("ClmMed_EBank_Name").value);
+    safeSetText(form, "ClmMed_EBank_NIRC", $("ClmMed_EBank_NIRC").value);
+    safeSetText(form, "ClmMed_EBank_AccNo", $("ClmMed_EBank_AccNo").value);
+    safeSetText(form, "ClmMed_EBank_Bank", $("ClmMed_EBank_Bank").value);
+    safeCheck(form, "ClmMed_EBank_Conventional", $("ClmMed_EBank_Conventional").checked);
+    safeCheck(form, "ClmMed_EBank_Islamic", $("ClmMed_EBank_Islamic").checked);
 
-const targetPageIndex = 3; // Page 4 (0-indexed)
+    // Section C - Signing Details 
+    safeSetText(form, "Nom_Nominee_SignState", $("Nom_Nominee_SignState").value);
+    safeSetText(form, "Nom_Nominee_SignDay", $("Nom_Nominee_SignDay").value);
+    safeSetText(form, "Nom_Nominee_SignMonth", $("Nom_Nominee_SignMonth").value);
+    safeSetText(form, "Nom_Nominee_SignYear", $("Nom_Nominee_SignYear").value);
 
-await embedSignatureToPdf(pdfDoc, targetPageIndex, { role: "owner",   x: 50,  y: 240, factor: 0.40 });
-await embedSignatureToPdf(pdfDoc, targetPageIndex, { role: "trustee", x: 240, y: 240, factor: 0.40 });
-await embedSignatureToPdf(pdfDoc, targetPageIndex, { role: "witness", x: 420, y: 240, factor: 0.40 });
+    safeSetText(form, "Nom_Nominee_PolicyOwner_Name", $("Nom_Nominee_PolicyOwner_Name").value);
+    safeSetText(form, "Nom_Nominee_PolicyOwner_NRIC", $("Nom_Nominee_PolicyOwner_NRIC").value);
+    safeSetText(form, "Nom_Nominee_Trustee_Name", $("Nom_Nominee_Trustee_Name").value);
+    safeSetText(form, "Nom_Nominee_Trustee_NIRC", $("Nom_Nominee_Trustee_NIRC").value);
 
-// (If you ever need to add "insured", it's just one extra line)
-// await embedSignatureToPdf(pdfDoc, targetPageIndex, { role: "insured", x: 50, y: 100, factor: 0.40 });
+    safeSetText(form, "Nom_Nominee_Witness_Name", $("Nom_Nominee_Witness_Name").value);
+    safeSetText(form, "Nom_Nominee_Witness_NIRC", $("Nom_Nominee_Witness_NIRC").value);
+    safeSetText(form, "Nom_Nominee_Witness_Mobile", $("Nom_Nominee_Witness_Mobile").value);
 
-    
-    // Flatten form fields before saving
-    //form.flatten();
-    
-        // Save & download FillPDF
+    // Embed Signatures
+    const targetPageIndex = 3; 
+    await embedSignatureToPdf(pdfDoc, targetPageIndex, { role: "owner",   x: 50,  y: 240, factor: 0.40 });
+    await embedSignatureToPdf(pdfDoc, targetPageIndex, { role: "trustee", x: 240, y: 240, factor: 0.40 });
+    await embedSignatureToPdf(pdfDoc, targetPageIndex, { role: "witness", x: 420, y: 240, factor: 0.40 });
+
     const pdfBytes = await pdfDoc.save();
 
-    // 1. Get Policy Number and handle naming
-    const policyInput = document.getElementById('Nom_PolicyNumber');
+    const policyInput = $("ILWD_PolicyNo");
     let policyNum = "NEW";
-    
     if (policyInput && policyInput.value.trim() !== "") {
-        // Remove special characters that aren't allowed in filenames
-        policyNum = policyInput.value.trim().replace(/[^a-z0-9]/gi, '_');
+      policyNum = policyInput.value.trim().replace(/[^a-z0-9]/gi, '_');
     }
 
-    const finalFileName = `${policyNum}_Nomination.pdf`;
+    const finalFileName = `${policyNum}_FundWithdrawal.pdf`;
 
-    // 2. Trigger Download
     const blob = new Blob([pdfBytes], { type: "application/pdf" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a"); 
-    
     a.href = url; 
-    a.download = finalFileName; // Dynamic name applied here
+    a.download = finalFileName;
     
     document.body.appendChild(a); 
     a.click(); 
@@ -901,50 +711,60 @@ await embedSignatureToPdf(pdfDoc, targetPageIndex, { role: "witness", x: 420, y:
     alert("PDF generation failed: " + (err.message || err));
     console.error(err);
   } finally {
-    // This assumes your $ helper is defined: const $ = id => document.getElementById(id);
     $("generate").disabled = false;
   }
 }
 
+async function embedSignatureToPdf(pdfDoc, pageIndex, { role, x, y, factor = 0.40 }) {
+  const sigData = localStorage.getItem(`sig_${FORM_ID}_${role}`);
+  if (!sigData) return;
 
+  try {
+    const pages = pdfDoc.getPages();
+    const targetPage = pages[Math.min(pageIndex, pages.length - 1)];
 
-/* ---------- RESET ALL DATA function ---------- */
-function resetAll() {
-  if (!confirm("Are you sure you want to reset the form? All saved data will be cleared.")) {
-    return;
+    const img = await pdfDoc.embedPng(sigData);
+    const { width, height } = img.size();
+
+    const previewEl = document.querySelector(`[data-sig-role="${role}"] [data-sig-preview]`);
+    const boxW = previewEl?.offsetWidth || 150;
+    const boxH = previewEl?.offsetHeight || 50;
+
+    const scale = Math.min(boxW / width, boxH / height);
+    const drawW = width * scale * factor;
+    const drawH = height * scale * factor;
+
+    targetPage.drawImage(img, { x, y, width: drawW, height: drawH });
+  } catch (err) {
+    console.error(`Failed to embed signature for role "${role}":`, err);
   }
+}
 
-  // 1) Clear ALL saved keys that belong to this form
-  //    (Everything starting with "Nom_" plus legacy signature keys)
-  const keys = Object.keys(localStorage);
-  keys.forEach(k => {
-    if (k.startsWith("Nom_")) localStorage.removeItem(k);
-  });
-  // Legacy sig keys (if you still use these)
-  ["sig_owner","sig_witness","sig_trustee"].forEach(k => localStorage.removeItem(k));
+/* ---------- RESET ALL DATA ---------- */
+function resetAll() {
+  if (!confirm("Are you sure you want to reset the form? All saved data will be cleared.")) return;
 
-  // 2) Clear the live UI values for Section A/E (inputs that remain in DOM)
+  localStorage.clear();
+
   document.querySelectorAll("input, select, textarea").forEach(el => {
-    if (!el.id) return;
     if (el.type === "checkbox" || el.type === "radio") el.checked = false;
     else el.value = "";
   });
 
-  // 3) Rebuild Nominees UI to exactly ONE card (Nominee 1)
-  nomineesContainer.innerHTML = "";
-  nomineeCount = 1;
-  localStorage.setItem("nomineeCount", 1);
-  nomineesContainer.appendChild(createNomineeEntry(1));
-  addNomineeBtn.disabled = false;
+  container.innerHTML = "";
+  selectedFundKeys.clear();
+  createFundRow();
 
-  // 4) Reset signature previews
-  $("preview_owner").innerHTML   = `<span>Tap to Sign (Policy Owner)</span>`;
-  $("preview_witness").innerHTML = `<span>Tap to Sign (Witness)</span>`;
-  $("preview_trustee").innerHTML = `<span>Tap to Sign (Trustee)</span>`;
+  document.querySelectorAll("[data-sig-role]").forEach(block => {
+    const role = block.dataset.sigRole;
+    const previewEl = block.querySelector("[data-sig-preview]");
+    if (previewEl) {
+      previewEl.innerHTML = `<span>Tap to Sign (${role.charAt(0).toUpperCase() + role.slice(1)})</span>`;
+    }
+  });
 
   showSaveStatus();
 }
-
 
 /* ---------- Wire buttons ---------- */
 $("generate").addEventListener("click", fillPDF);
