@@ -639,151 +639,103 @@ document.getElementById('same_as_insured').addEventListener('change', function()
   
 /* ==========================================================================
    PAGE SCOPE CONFIGURATION
-   Set a unique identifier for this form (e.g., "ilpwd", "claim_form", "nomination")
    ========================================================================== */
-const FORM_ID = "ilpwd";
-
+const FORM_ID = "ilpwd"; // Unique key prefix per form
 
 /* ==========================================================================
-   1. SIGNATURE MODAL & CANVAS DRAWING ENGINE
+   1. SIGNATURE MODAL & SIGNATURE_PAD ENGINE
    ========================================================================== */
-class SignatureManager {
-  constructor({ modalId, canvasId, clearBtnId, cancelBtnId, doneBtnId, titleId }) {
-    this.modal = document.getElementById(modalId);
-    this.canvas = document.getElementById(canvasId);
-    this.ctx = this.canvas.getContext("2d");
-    this.titleEl = document.getElementById(titleId);
+const $ = (id) => document.getElementById(id);
 
-    this.currentTarget = null;
-    this.drawing = false;
+let sigTarget = null;
+const sigModal = $("sigModal");
+const sigCanvas = $("sigCanvas");
+const sigCtx = sigCanvas.getContext("2d");
 
-    this._initEvents(clearBtnId, cancelBtnId, doneBtnId);
-  }
+// Initialize SignaturePad Library
+const signaturePad = new SignaturePad(sigCanvas, {
+  minWidth: 0.7,
+  maxWidth: 2.5,
+  penColor: "black",
+  backgroundColor: "rgba(0,0,0,0)"
+});
 
-  /* Sharp rendering on HiDPI / Retina displays */
-  resizeCanvas() {
-    const dpr = window.devicePixelRatio || 1;
-    const cssWidth = this.canvas.clientWidth || this.canvas.parentElement?.clientWidth || 560;
-    const cssHeight = this.canvas.clientHeight || 220;
+// Resize canvas handling HiDPI displays + restoring existing drawing
+function resizeCanvas() {
+  const ratio = Math.max(window.devicePixelRatio || 1, 1);
+  const storageKey = sigTarget ? `sig_${FORM_ID}_${sigTarget}` : null;
+  const savedFromStorage = storageKey ? localStorage.getItem(storageKey) : null;
 
-    this.canvas.width = Math.max(1, Math.floor(cssWidth * dpr));
-    this.canvas.height = Math.max(1, Math.floor(cssHeight * dpr));
+  sigCanvas.width = sigCanvas.offsetWidth * ratio;
+  sigCanvas.height = sigCanvas.offsetHeight * ratio;
+  sigCtx.setTransform(ratio, 0, 0, ratio, 0, 0);
 
-    this.ctx.setTransform(1, 0, 0, 1, 0, 0);
-    this.ctx.scale(dpr, dpr);
-    this.ctx.lineWidth = 2;
-    this.ctx.lineCap = "round";
-    this.ctx.strokeStyle = "#000";
-  }
+  signaturePad.clear(); // Clear internal pad state
 
-  _getPos(e) {
-    const rect = this.canvas.getBoundingClientRect();
-    const touch = e.touches && e.touches[0];
-    const clientX = touch ? touch.clientX : e.clientX;
-    const clientY = touch ? touch.clientY : e.clientY;
-    return { x: clientX - rect.left, y: clientY - rect.top };
-  }
-
-  _initEvents(clearBtnId, cancelBtnId, doneBtnId) {
-    const startDraw = (e) => {
-      this.drawing = true;
-      this.ctx.beginPath();
-      const { x, y } = this._getPos(e);
-      this.ctx.moveTo(x, y);
-      e.preventDefault?.();
+  if (savedFromStorage) {
+    const img = new Image();
+    img.onload = () => {
+      sigCtx.drawImage(img, 0, 0, sigCanvas.offsetWidth, sigCanvas.offsetHeight);
     };
-
-    const moveDraw = (e) => {
-      if (!this.drawing) return;
-      const { x, y } = this._getPos(e);
-      this.ctx.lineTo(x, y);
-      this.ctx.stroke();
-      this.ctx.beginPath();
-      this.ctx.moveTo(x, y);
-      e.preventDefault?.();
-    };
-
-    const endDraw = () => {
-      this.drawing = false;
-      this.ctx.beginPath();
-    };
-
-    this.canvas.addEventListener("mousedown", startDraw);
-    this.canvas.addEventListener("mousemove", moveDraw);
-    window.addEventListener("mouseup", endDraw);
-
-    this.canvas.addEventListener("touchstart", startDraw, { passive: false });
-    this.canvas.addEventListener("touchmove", moveDraw, { passive: false });
-    this.canvas.addEventListener("touchend", endDraw);
-
-    document.getElementById(clearBtnId)?.addEventListener("click", () => {
-      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    });
-
-    document.getElementById(cancelBtnId)?.addEventListener("click", () => this.close());
-
-    document.getElementById(doneBtnId)?.addEventListener("click", () => {
-      if (!this.currentTarget) return;
-      const dataURL = this.canvas.toDataURL("image/png");
-      
-      // Save using key pattern: "sig_ilpwd_owner", "sig_ilpwd_witness", etc.
-      localStorage.setItem(`sig_${FORM_ID}_${this.currentTarget.role}`, dataURL);
-
-      if (this.currentTarget.previewEl) {
-        this.currentTarget.previewEl.innerHTML = `<img alt="Signature ${this.currentTarget.role}" src="${dataURL}">`;
-      }
-      this.close();
-    });
-
-    window.addEventListener("resize", () => {
-      if (this.modal.getAttribute("aria-hidden") === "false") {
-        const tempImg = new Image();
-        tempImg.onload = () => {
-          this.resizeCanvas();
-          const dpr = window.devicePixelRatio || 1;
-          this.ctx.drawImage(tempImg, 0, 0, this.canvas.width / dpr, this.canvas.height / dpr);
-        };
-        tempImg.src = this.canvas.toDataURL("image/png");
-      }
-    });
-  }
-
-  open({ role, title, previewEl }) {
-    this.currentTarget = { role, previewEl };
-    if (this.titleEl) this.titleEl.textContent = title;
-
-    this.modal.style.display = "block";
-    this.modal.setAttribute("aria-hidden", "false");
-
-    requestAnimationFrame(() => {
-      this.resizeCanvas();
-      
-      const existing = localStorage.getItem(`sig_${FORM_ID}_${role}`);
-      if (existing) {
-        const img = new Image();
-        img.onload = () => {
-          const dpr = window.devicePixelRatio || 1;
-          this.ctx.drawImage(img, 0, 0, this.canvas.width / dpr, this.canvas.height / dpr);
-        };
-        img.src = existing;
-      }
-    });
-  }
-
-  close() {
-    this.modal.style.display = "none";
-    this.modal.setAttribute("aria-hidden", "true");
-    this.currentTarget = null;
+    img.src = savedFromStorage;
   }
 }
 
+function openSig({ role, title }) {
+  sigTarget = role;
+  
+  if ($("sigModalTitle")) {
+    $("sigModalTitle").textContent = title || `Sign: ${role}`;
+  }
+
+  sigModal.style.display = "block";
+  sigModal.setAttribute("aria-hidden", "false");
+
+  requestAnimationFrame(() => {
+    resizeCanvas();
+  });
+}
+
+function closeSigModal() {
+  sigModal.style.display = "none";
+  sigModal.setAttribute("aria-hidden", "true");
+  sigTarget = null;
+}
+
+// Modal Event Listeners
+$("sigDone")?.addEventListener("click", () => {
+  if (!sigTarget) return;
+
+  if (signaturePad.isEmpty()) {
+    alert("Please provide a signature first.");
+    return;
+  }
+
+  const dataURL = sigCanvas.toDataURL("image/png");
+  localStorage.setItem(`sig_${FORM_ID}_${sigTarget}`, dataURL);
+  
+  // Find preview container for current role
+  const block = document.querySelector(`[data-sig-role="${sigTarget}"]`);
+  const previewDiv = block?.querySelector("[data-sig-preview]");
+  if (previewDiv) {
+    previewDiv.innerHTML = `<img src="${dataURL}" style="max-height:100%; width:auto;" alt="Signature ${sigTarget}">`;
+  }
+
+  closeSigModal();
+});
+
+$("sigClear")?.addEventListener("click", () => {
+  signaturePad.clear();
+});
+
+$("sigCancel")?.addEventListener("click", closeSigModal);
+window.addEventListener("resize", resizeCanvas);
+
 
 /* ==========================================================================
-   2. AUTOMATIC BINDING ON DOM READY
+   2. DOM BINDING AUTOMATION
    ========================================================================== */
-let sigManager;
-
-function initSignatureFields(sigManager) {
+function initSignatureFields() {
   const blocks = document.querySelectorAll("[data-sig-role]");
 
   blocks.forEach((block) => {
@@ -795,35 +747,27 @@ function initSignatureFields(sigManager) {
 
     // Open modal on click
     previewEl?.addEventListener("click", () => {
-      sigManager.open({ role, title, previewEl });
+      openSig({ role, title });
     });
 
-    // Clear saved signature and reset UI
+    // Clear signature button on form
     clearBtn?.addEventListener("click", () => {
       localStorage.removeItem(`sig_${FORM_ID}_${role}`);
       if (previewEl) previewEl.innerHTML = defaultHtml;
     });
 
-    // Restore saved signatures on page load
+    // Load saved signature on page load
     const saved = localStorage.getItem(`sig_${FORM_ID}_${role}`);
     if (saved && previewEl) {
-      previewEl.innerHTML = `<img alt="Signature ${role}" src="${saved}">`;
+      previewEl.innerHTML = `<img src="${saved}" style="max-height:100%; width:auto;" alt="Signature ${role}">`;
     }
   });
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  sigManager = new SignatureManager({
-    modalId: "sigModal",
-    canvasId: "sigCanvas",
-    clearBtnId: "sigClear",
-    cancelBtnId: "sigCancel",
-    doneBtnId: "sigDone",
-    titleId: "sigModalTitle"
-  });
-
-  initSignatureFields(sigManager);
+  initSignatureFields();
 });
+
 
 
 /* ---------- Generate PDF ---------- */
