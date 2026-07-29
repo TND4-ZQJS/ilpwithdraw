@@ -98,7 +98,7 @@
     </div>
      
  <div class="row">
-  <label style="flex:1">NIRC
+  <label style="flex:1">NIRC/Passport No.
       <input id="ILWD_PO_NIRC" type="text" class="persist" placeholder="Enter Policy No.">
     </label>
 </div> 
@@ -112,7 +112,7 @@
     </div>
 
      <div class="row">
-    <label style="flex:1">NIRC
+    <label style="flex:1">NIRC/Passport No.
       <input id="ILWD_Insured" type="text" class="persist" placeholder="Enter Name">
     </label>
     </div>
@@ -122,8 +122,13 @@
      <section class="section">
   
     <div class="row">
-    <label style="flex:1">Reason of Withdrawing
-      <input id="ILWD_Reason" type="text" class="persist" placeholder="Enter reason">
+      <label style="flex:1">Reason of Withdrawing
+      <select id="ILWD_Reason" class="persist">
+          <option value="">-- Select Reason --</option>
+          <option>For Personal Financial Needs</option>
+          <option>For Other Investment Purpose</option>
+          <option>To be transferred to other policy</option>
+      </select>
     </label>  
     </div>  
 
