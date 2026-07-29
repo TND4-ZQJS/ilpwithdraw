@@ -101,6 +101,10 @@
   <label style="flex:1">NIRC/Passport No.
       <input id="ILWD_PO_NIRC" type="text" class="persist" placeholder="Enter Policy No.">
     </label>
+
+  <label style="flex:1">Mobile
+      <input id="ILWD_PO_Mobile" type="text" class="persist">
+  </label> 
 </div> 
       </section>
 
@@ -257,12 +261,17 @@
     </div>
     <div class="row">
       <label style="flex:1">Policy Owner's Name
-        <input id="Nom_Nominee_PolicyOwner_Name" type="text" class="persist">
+        <input id="ILWD_PO_Name" type="text" class="persist">
       </label>
     </div>
     <div class="row">
       <label style="flex:1">NIRC/Passport No.
-        <input id="Nom_Nominee_PolicyOwner_NRIC" type="text" class="persist">
+        <input id="ILWD_PO_NIRC" type="text" class="persist">
+      </label>
+    </div>
+        <div class="row">
+      <label style="flex:1">Mobile No.
+        <input id="ILWD_PO_Mobile" type="text" class="persist">
       </label>
     </div>
 
@@ -279,15 +288,15 @@
     <h3>Witness Signature</h3>
     <div class="row">
       <label style="flex:1">Witness' Name
-        <input id="Nom_Nominee_Witness_Name" type="text" class="persist">
+        <input id="ILWD_Witness_Name" type="text" class="persist">
       </label>
     </div>
     <div class="row">
       <label style="flex:1">NIRC/Passport No.
-        <input id="Nom_Nominee_Witness_NIRC" type="text" class="persist">
+        <input id="ILWD_Witness_NIRC" type="text" class="persist">
       </label>
       <label style="flex:1">Mobile
-        <input id="Nom_Nominee_Witness_Mobile" type="text" class="persist">
+        <input id="ILWD_Witness_Mobile" type="text" class="persist">
       </label>
     </div>
 
@@ -304,12 +313,12 @@
     <h3>Trustee Signature</h3>
     <div class="row">
       <label style="flex:1">Trustee's Name
-        <input id="Nom_Nominee_Trustee_Name" type="text" class="persist">
+        <input id="ILWD_Trustee_Name" type="text" class="persist">
       </label>
     </div>
     <div class="row">
       <label style="flex:1">NIRC/Passport No.
-        <input id="Nom_Nominee_Trustee_NIRC" type="text" class="persist">
+        <input id="ILWD_Trustee_NIRC" type="text" class="persist">
       </label>
     </div>
 
@@ -349,7 +358,7 @@
 <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.2.0/dist/signature_pad.umd.min.js"></script>
 <script>
 /* ---------- CONFIG ---------- */
-const PDF_FILENAME = "Nomination and Trustees_LF4056_LF4054_fillable.pdf";
+const PDF_FILENAME = "investment-link-partial-withdrawal_LF4069_21102024_fillable.pdf";
 const FORM_ID = "ilpwd";
 
 /* ---------- DOM Helpers ---------- */
