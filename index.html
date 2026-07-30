@@ -369,7 +369,7 @@
   <section class="section" data-sig-role="owner" data-sig-title="Sign: Policy Owner">
     <h3>Policy Owner Signature</h3>
 <div class="row">
-  <label style="flex:1">Policy Owner: 
+  <label style="flex:1">Name: 
     <span id="ILWD_EBank_Name_Display" style="font-weight: 600;">-</span>
   </label>
 </div>
@@ -387,11 +387,11 @@
   <!-- SECTION: Witness Signature -->
   <section class="section" data-sig-role="witness" data-sig-title="Sign: Witness">
     <h3>Witness Signature</h3>
-    <div class="row">
-      <label style="flex:1">Witness' Name
-        <input id="ILWD_Witness_Name" type="text" class="persist">
-      </label>
-    </div>
+<div class="row">
+  <label style="flex:1">Name: 
+    <span id="ILWD_Withess_Name_Display" style="font-weight: 600;">-</span>
+  </label>
+</div>
 
     <div class="sig-preview" data-sig-preview>
       <span>Tap to Sign (Witness)</span>
@@ -404,11 +404,11 @@
   <!-- SECTION: Trustee Signature -->
   <section class="section" data-sig-role="trustee" data-sig-title="Sign: Trustee">
     <h3>Trustee Signature</h3>
-    <div class="row">
-      <label style="flex:1">Trustee's Name
-        <input id="ILWD_Trustee_Name" type="text" class="persist">
-      </label>
-    </div>
+<div class="row">
+  <label style="flex:1">Name: 
+    <span id="ILWD_Trustee_Name_Display" style="font-weight: 600;">-</span>
+  </label>
+</div>
 
     <div class="sig-preview" data-sig-preview>
       <span>Tap to Sign (Trustee)</span>
@@ -791,16 +791,30 @@ document.addEventListener("DOMContentLoaded", () => {
 
 /* ---------- Signing section : Read Value for Display  ---------- */
 document.addEventListener("DOMContentLoaded", () => {
-  const displayEl = document.getElementById("ILWD_EBank_Name_Display");
-  
-  if (displayEl) {
-    // 1. Fetch value from local storage
-    const savedName = localStorage.getItem("ILWD_PO_Name");
+  // Map: 'localStorage_Key' : 'Display_Element_ID'
+  const fieldMap = {
+    "ILWD_PO_Name": "ILWD_EBank_Name_Display",
     
-    // 2. Format to Uppercase and display (falls back to "-" if empty)
-    displayEl.textContent = savedName ? savedName.toUpperCase() : "-";
-  }
+    // Witness fields
+    "ILWD_Witness_Name":  "ILWD_Witness_Name_Display",
+    
+    // Trustee fields
+    "ILWD_Trustee_Name":  "ILWD_Trustee_Name_Display"
+  };
+
+  // Loop through the map and update each text view
+  Object.entries(fieldMap).forEach(([storageKey, displayId]) => {
+    const displayEl = document.getElementById(displayId);
+    if (!displayEl) return;
+
+    const savedValue = localStorage.getItem(storageKey);
+    
+    // Display uppercase value, or '-' if empty/missing
+    displayEl.textContent = savedValue ? savedValue.toUpperCase() : "-";
+  });
 });
+
+
 
 
 
