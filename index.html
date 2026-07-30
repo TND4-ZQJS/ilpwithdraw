@@ -244,7 +244,7 @@
 
     <div class="row">
     <label style="flex:1">Transfer the Partial Withdrawal amount
-      <input id="ILWD_Trf_Amt" type="text" class="persist" placeholder="Enter Amount (RM)">
+      <input id="ILWD_Trf_Amount" type="text" class="persist" placeholder="Enter Amount (RM)">
     </label>
       
     <label style="flex:1">to Policy No.
@@ -905,10 +905,8 @@ document.addEventListener("DOMContentLoaded", () => {
 document.addEventListener("DOMContentLoaded", () => {
   const fieldMap = {
     "ILWD_PO_Name":      "ILWD_EBank_Name_Display",
-    "ILWD_Witness_Name": "ILWD_Witness_Name_Display",
-    "ILWD_Witness_NIRC": "ILWD_Witness_NIRC_Display",
+    "ILWD_Witness_Name": "ILWD_Witness_Name_Display",,
     "ILWD_Trustee_Name": "ILWD_Trustee_Name_Display",
-    "ILWD_Trustee_NIRC": "ILWD_Trustee_NIRC_Display"
   };
 
   function updateDisplay(storageKey, displayId, directValue = null) {
