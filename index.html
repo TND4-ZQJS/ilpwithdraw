@@ -796,34 +796,45 @@ document.addEventListener("DOMContentLoaded", () => {
 
 /* ---------- Signing section : Read Value for Display  ---------- */
 document.addEventListener("DOMContentLoaded", () => {
-  // Map: 'localStorage_Key' : 'Display_Element_ID'
+  // Map: 'localStorage_Key' (Source Input ID) : 'Display_Element_ID'
   const fieldMap = {
-    "ILWD_PO_Name": "ILWD_EBank_Name_Display",
-    
-    // Witness fields
-    "ILWD_Witness_Name":  "ILWD_Witness_Name_Display",
-    
-    // Trustee fields
-    "ILWD_Trustee_Name":  "ILWD_Trustee_Name_Display"
+    "ILWD_PO_Name":      "ILWD_EBank_Name_Display",
+    "ILWD_Witness_Name": "ILWD_Witness_Name_Display",
+    "ILWD_Trustee_Name": "ILWD_Trustee_Name_Display",
   };
 
-  // Loop through the map and update each text view
-  Object.entries(fieldMap).forEach(([storageKey, displayId]) => {
+  // Helper function to update single display element
+  function updateDisplay(storageKey, displayId) {
     const displayEl = document.getElementById(displayId);
     if (!displayEl) return;
 
-    const savedValue = localStorage.getItem(storageKey);
-    
-    // Display uppercase value, or '-' if empty/missing
-    displayEl.textContent = savedValue ? savedValue.toUpperCase() : "-";
+    // Check localStorage first, fallback to source input value if available
+    const sourceInput = document.getElementById(storageKey);
+    const value = localStorage.getItem(storageKey) || (sourceInput ? sourceInput.value : "");
+
+    displayEl.textContent = value ? value.toUpperCase() : "-";
+  }
+
+  // 1. Initial render on page load
+  Object.entries(fieldMap).forEach(([storageKey, displayId]) => {
+    updateDisplay(storageKey, displayId);
+
+    // 2. Attach live typing listener to the source input field
+    const sourceInput = document.getElementById(storageKey);
+    if (sourceInput) {
+      sourceInput.addEventListener("input", () => {
+        updateDisplay(storageKey, displayId);
+      });
+    }
+  });
+
+  // 3. Listen for window storage updates (handles updates from external sync functions)
+  window.addEventListener("storage", () => {
+    Object.entries(fieldMap).forEach(([storageKey, displayId]) => {
+      updateDisplay(storageKey, displayId);
+    });
   });
 });
-
-
-
-
-
-
 
 /* ---------- Signature Engine ---------- */
 let sigTarget = null;
