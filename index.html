@@ -229,7 +229,7 @@
 
   <!-- Transfer to other policy -->
   
-  <section class="section" id="sectionB">
+  <section class="section">
 
      <div class="row">
   <label style="display:flex; align-items:center; gap:4px; cursor:pointer; background: #f0f7ff; padding: 5px; border-radius: 8px;">
@@ -803,10 +803,13 @@ document.addEventListener("DOMContentLoaded", () => {
   }, 50);
 });
 
-/* ---------- Transfer to Policy - Hide Options & Textbox ---------- */  
+/* ---------- Transfer to Policy Section & Sub-Options Engine ---------- */
 document.addEventListener("DOMContentLoaded", () => {
-  // Array of checkbox ID -> text input ID mappings
-  const transferFields = [
+  const mainCB = document.getElementById("Trf_to_Other_Policy_CB");
+  const section = document.getElementById("Trf_to_Other_Policy");
+
+  // Sub-checkboxes mapped to their amount textboxes
+  const subTransferFields = [
     { cbId: "ILWD_Trf_FYPNewB", amtId: "ILWD_Trf_FYPNewB_Amt" },
     { cbId: "ILWD_Trf_Premium",  amtId: "ILWD_Trf_Premium_Amt" },
     { cbId: "ILWD_Trf_TopUp",    amtId: "ILWD_Trf_TopUp_Amt" },
@@ -814,34 +817,90 @@ document.addEventListener("DOMContentLoaded", () => {
     { cbId: "ILWD_Trf_APL",      amtId: "ILWD_Trf_APL_Amt" }
   ];
 
-  transferFields.forEach(({ cbId, amtId }) => {
+  /* --------------------------------------------------------------------------
+     1. SUB-CHECKBOX TOGGLES (Show/Hide Sub-Amount Fields)
+     -------------------------------------------------------------------------- */
+  function updateSubFieldState({ cbId, amtId }) {
     const checkbox = document.getElementById(cbId);
     const amtInput = document.getElementById(amtId);
 
     if (!checkbox || !amtInput) return;
 
-    // Toggle visibility & clear data if unchecked
-    function toggleInputState() {
-      if (checkbox.checked) {
-        amtInput.style.display = "inline-block"; // Show textbox
-      } else {
-        amtInput.style.display = "none";         // Hide textbox
-        amtInput.value = "";                     // Erase text input
-        
-        // Remove amount from localStorage so it doesn't persist secretly
-        localStorage.removeItem(amtId);
-        
-        if (typeof showSaveStatus === "function") showSaveStatus();
-      }
+    if (checkbox.checked) {
+      amtInput.style.display = "inline-block";
+    } else {
+      amtInput.style.display = "none";
+      amtInput.value = "";
+      localStorage.removeItem(amtId);
     }
+  }
 
-    // Listen for checkbox changes
-    checkbox.addEventListener("change", toggleInputState);
-
-    // Initial run on page load (with a slight delay so autoBindSave finishes restoring checkbox state)
-    setTimeout(toggleInputState, 50);
+  // Bind listeners for sub-checkboxes
+  subTransferFields.forEach((fieldPair) => {
+    const checkbox = document.getElementById(fieldPair.cbId);
+    if (checkbox) {
+      checkbox.addEventListener("change", () => updateSubFieldState(fieldPair));
+    }
   });
-});  
+
+  /* --------------------------------------------------------------------------
+     2. MAIN SECTION DATA WIPER & TOGGLE
+     -------------------------------------------------------------------------- */
+  function clearEntireSectionData() {
+    if (!section) return;
+
+    // Grab all form elements within the section
+    const inputs = section.querySelectorAll("input, select, textarea");
+
+    inputs.forEach((input) => {
+      // 1. Reset DOM values
+      if (input.type === "checkbox" || input.type === "radio") {
+        input.checked = false;
+      } else {
+        input.value = "";
+      }
+
+      // 2. Re-hide sub-amount textboxes specifically
+      if (input.id.endsWith("_Amt")) {
+        input.style.display = "none";
+      }
+
+      // 3. Clear localStorage entries
+      if (input.id) {
+        localStorage.removeItem(input.id);
+      }
+    });
+
+    if (typeof showSaveStatus === "function") showSaveStatus();
+  }
+
+  function toggleMainSection() {
+    if (!mainCB || !section) return;
+
+    if (mainCB.checked) {
+      section.style.display = ""; // Show section
+      // Check sub-fields in case restored checkbox states need their textboxes visible
+      subTransferFields.forEach(updateSubFieldState);
+    } else {
+      section.style.display = "none"; // Hide section
+      clearEntireSectionData();       // Erase values and localStorage
+    }
+  }
+
+  if (mainCB) {
+    mainCB.addEventListener("change", toggleMainSection);
+  }
+
+  /* --------------------------------------------------------------------------
+     3. INITIALIZATION (Delayed for autoBindSave restoration)
+     -------------------------------------------------------------------------- */
+  setTimeout(() => {
+    // Evaluate sub-checkboxes
+    subTransferFields.forEach(updateSubFieldState);
+    // Evaluate main section visibility
+    toggleMainSection();
+  }, 50);
+});
 
 /* ---------- Signature Names Display ---------- */
 document.addEventListener("DOMContentLoaded", () => {
