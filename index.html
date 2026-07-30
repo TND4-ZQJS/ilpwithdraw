@@ -719,6 +719,14 @@ document.addEventListener("DOMContentLoaded", () => {
     if (typeof showSaveStatus === "function") showSaveStatus();
   }
 
+  // Helper to clear field + remove from localStorage + save status
+  function clearAndRemovePersist(el) {
+    if (!el) return;
+    el.value = "";
+    localStorage.removeItem(el.id);
+    if (typeof showSaveStatus === "function") showSaveStatus();
+  }
+
   /* --- 1. E-BANK SYNC (Always Locked & Synced) --- */
   function syncEBankFromPO() {
     if (!eBankName || !eBankNric || !poName || !poNric) return;
@@ -741,6 +749,12 @@ document.addEventListener("DOMContentLoaded", () => {
     setAndPersist(insuredNric, toUpper(poNric.value));
   }
 
+  function clearInsuredFields() {
+    if (!insuredName || !insuredNric) return;
+    clearAndRemovePersist(insuredName);
+    clearAndRemovePersist(insuredNric);
+  }
+
   function setInsuredLocked(locked) {
     if (!insuredName || !insuredNric) return;
     insuredName.readOnly = locked;
@@ -756,6 +770,8 @@ document.addEventListener("DOMContentLoaded", () => {
       syncInsuredFromPO();
       setInsuredLocked(true);
     } else {
+      // Clear data & remove from localStorage when unchecked
+      clearInsuredFields();
       setInsuredLocked(false);
     }
   }
@@ -784,12 +800,19 @@ document.addEventListener("DOMContentLoaded", () => {
     insuredPOCheckbox.addEventListener("change", handleInsuredCheckboxChange);
   }
 
-  // Initial Sync on Page Load (Handles restored localStorage state)
+  // Initial Sync on Page Load
   setTimeout(() => {
     syncEBankFromPO();
-    handleInsuredCheckboxChange();
+    // Only set lock state without clearing on page startup
+    if (insuredPOCheckbox && insuredPOCheckbox.checked) {
+      syncInsuredFromPO();
+      setInsuredLocked(true);
+    } else {
+      setInsuredLocked(false);
+    }
   }, 50);
 });
+
 
 
 
