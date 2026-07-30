@@ -368,11 +368,13 @@
   <!-- SECTION: Policy Owner Signature -->
   <section class="section" data-sig-role="owner" data-sig-title="Sign: Policy Owner">
     <h3>Policy Owner Signature</h3>
-    <div class="row">
-      <label style="flex:1">Policy Owner's Name
-        <input id="ILWD_PO_Name" type="text" class="persist">
-      </label>
-    </div>
+<div class="row">
+  <label style="flex:1">Policy Owner: 
+    <span id="ILWD_EBank_Name_Display" style="font-weight: 600;">-</span>
+  </label>
+</div>
+
+
 
     <div class="sig-preview" data-sig-preview>
       <span>Tap to Sign (Policy Owner)</span>
@@ -786,6 +788,20 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }, 50);
 });
+
+/* ---------- Signing section : Read Value for Display  ---------- */
+document.addEventListener("DOMContentLoaded", () => {
+  const displayEl = document.getElementById("ILWD_EBank_Name_Display");
+  
+  if (displayEl) {
+    // 1. Fetch value from local storage
+    const savedName = localStorage.getItem("ILWD_PO_Name");
+    
+    // 2. Format to Uppercase and display (falls back to "-" if empty)
+    displayEl.textContent = savedName ? savedName.toUpperCase() : "-";
+  }
+});
+
 
 
 
