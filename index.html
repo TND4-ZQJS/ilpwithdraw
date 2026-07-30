@@ -694,25 +694,54 @@ function getPdfFormData() {
   return pdfData;
 }
 
-/* ---------- Auto-Fill E Banking Name & NIRC ---------- */
-const poName = document.getElementById('ILWD_PO_Name');
-const poNIRC = document.getElementById('ILWD_PO_NIRC');
-const eBankName = document.getElementById('ILWD_EBank_Name');
-const eBankNIRC = document.getElementById('ILWD_EBank_NIRC');
+/* ---------- Policy Owner -> EBank Data Sync Helper ---------- */
+document.addEventListener("DOMContentLoaded", () => {
+  const poName  = document.getElementById("ILWD_PO_Name");
+  const poNric  = document.getElementById("ILWD_PO_NIRC");
 
-// Sync Policy Owner Name -> Bank Name
-poName.addEventListener('input', () => {
-  const val = poName.value;
-  eBankName.value = val;
-  localStorage.setItem('ILWD_EBank_Name', val);
+  const eBankName = document.getElementById("ILWD_EBank_Name");
+  const eBankNric = document.getElementById("ILWD_EBank_NIRC");
+
+  if (!poName || !poNric || !eBankName || !eBankNric) return;
+
+  // Sync values and save to localStorage (forcing uppercase)
+  function syncEBankFromPO() {
+    const uppercaseName = poName.value.toUpperCase();
+    const uppercaseNric = poNric.value.toUpperCase();
+
+    eBankName.value = uppercaseName;
+    eBankNric.value = uppercaseNric;
+
+    // Save directly to localStorage
+    localStorage.setItem(eBankName.id, uppercaseName);
+    localStorage.setItem(eBankNric.id, uppercaseNric);
+    
+    // Show save indicator if the function exists
+    if (typeof showSaveStatus === "function") {
+      showSaveStatus();
+    }
+  }
+
+  // Set inputs to non-editable and apply visual dimming class
+  function lockEBankFields() {
+    eBankName.readOnly = true;
+    eBankNric.readOnly = true;
+
+    eBankName.classList.add("dimmed");
+    eBankNric.classList.add("dimmed");
+  }
+
+  // 1. Lock the fields permanently (since PO is the only allowed account holder)
+  lockEBankFields();
+
+  // 2. Perform initial sync on page load to match restored PO values
+  syncEBankFromPO();
+
+  // 3. Keep EBank fields in sync in real-time as Policy Owner types
+  poName.addEventListener("input", syncEBankFromPO);
+  poNric.addEventListener("input", syncEBankFromPO);
 });
 
-// Sync Policy Owner NIRC -> Bank NIRC
-poNIRC.addEventListener('input', () => {
-  const val = poNIRC.value;
-  eBankNIRC.value = val;
-  localStorage.setItem('ILWD_EBank_NIRC', val);
-});
 
 /* ---------- Signature Engine ---------- */
 let sigTarget = null;
