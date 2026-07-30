@@ -95,13 +95,33 @@
 
    <section class="section">
 
-     <div class="row">
+      <!-- Policy Owner details -->
+    <div class="row">
+    <label style="flex:1">Policy Owner
+      <input id="ILWD_Insured_Name" type="text" class="persist" placeholder="Enter Name">
+    </label>
+    </div>
+     
+ <div class="row">
+  <label style="flex:1">NIRC/Passport No.
+      <input id="ILWD_PO_NIRC" type="text" class="persist" placeholder="Enter Policy No.">
+    </label>
+
+  <label style="flex:1">Mobile No.
+      <input id="ILWD_PO_Mobile" type="text" class="persist" placeholder="Enter Mobile No.">
+  </label> 
+</div> 
+      </section>
+
+         <!-- Insured details -->
+
+       <div class="row">
   <label style="display:flex; align-items:center; gap:4px; cursor:pointer; background: #f0f7ff; padding: 5px; border-radius: 8px;">
     <input id="ILWD_Insured_is_PO" type="checkbox" class="persist">
     <span style="font-weight:500; color:var(--accent);">Insured is also Policy Owner</span>
   </label>
      </div>
-     
+  
     <div class="row">
     <label style="flex:1">Proposed Life Insured / Insured
       <input id="ILWD_Insured_Name" type="text" class="persist" placeholder="Enter Name">
@@ -113,10 +133,6 @@
       <input id="ILWD_PO_NIRC" type="text" class="persist" placeholder="Enter Policy No.">
     </label>
 
-  <label style="flex:1">Mobile No.
-      <input id="ILWD_PO_Mobile" type="text" class="persist">
-  </label> 
-</div> 
       </section>
 
     <section class="section">
