@@ -257,21 +257,30 @@
     </div>  
     
 <div class="grid-2">
-      <div>
-        <label class="inline"><input id="ILWD_Trf_FYPNewB" class="persist" type="checkbox">First year premuim for new application</label><input id="ILWD_Trf_FYPNewB_Amt" class="persist" type="text" placeholder="Enter Amount (RM)">
-      </div>
-      <div>
-        <label class="inline"><input id="Complx_ReducePremium_Topup_Yes" class="persist" type="checkbox">Premium</label><input id="Complx_ReducePremium_Topup_Amt" class="persist" type="text" placeholder="Enter Amount (RM)">
-      </div>
-      <div>
-        <label class="inline"><input id="Complx_ReducePremium_Topup_Yes" class="persist" type="checkbox">Single Premium Top-Up</label><input id="Complx_ReducePremium_Topup_Amt" class="persist" type="text" placeholder="Enter Amount (RM)">
-      </div>
-      <div>
-        <label class="inline"><input id="Complx_ReducePremium_Topup_Yes" class="persist" type="checkbox">Policy Loan repayment</label><input id="Complx_ReducePremium_Topup_Amt" class="persist" type="text" placeholder="Enter Amount (RM)">
-      </div>
-          <div>
-        <label class="inline"><input id="Complx_ReducePremium_Topup_Yes" class="persist" type="checkbox">Automatic Premium Loan repayment</label><input id="Complx_ReducePremium_Topup_Amt" class="persist" type="text" placeholder="Enter Amount (RM)">
-      </div>
+  <div>
+    <label class="inline"><input id="ILWD_Trf_FYPNewB" class="persist" type="checkbox">First year premuim for new application</label>
+    <input id="ILWD_Trf_FYPNewB_Amt" class="persist" type="text" placeholder="Enter Amount (RM)" style="display:none;">
+  </div>
+  
+  <div>
+    <label class="inline"><input id="ILWD_Trf_Premium" class="persist" type="checkbox">Premium</label>
+    <input id="ILWD_Trf_Premium_Amt" class="persist" type="text" placeholder="Enter Amount (RM)" style="display:none;">
+  </div>
+  
+  <div>
+    <label class="inline"><input id="ILWD_Trf_TopUp" class="persist" type="checkbox">Single Premium Top-Up</label>
+    <input id="ILWD_Trf_TopUp_Amt" class="persist" type="text" placeholder="Enter Amount (RM)" style="display:none;">
+  </div>
+  
+  <div>
+    <label class="inline"><input id="ILWD_Trf_Loan" class="persist" type="checkbox">Policy Loan repayment</label>
+    <input id="ILWD_Trf_Loan_Amt" class="persist" type="text" placeholder="Enter Amount (RM)" style="display:none;">
+  </div>
+  
+  <div>
+    <label class="inline"><input id="ILWD_Trf_APL" class="persist" type="checkbox">Automatic Premium Loan repayment</label>
+    <input id="ILWD_Trf_APL_Amt" class="persist" type="text" placeholder="Enter Amount (RM)" style="display:none;">
+  </div>
 </div>
   
     
@@ -793,6 +802,46 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }, 50);
 });
+
+/* ---------- Transfer to Policy - Hide Options & Textbox ---------- */  
+document.addEventListener("DOMContentLoaded", () => {
+  // Array of checkbox ID -> text input ID mappings
+  const transferFields = [
+    { cbId: "ILWD_Trf_FYPNewB", amtId: "ILWD_Trf_FYPNewB_Amt" },
+    { cbId: "ILWD_Trf_Premium",  amtId: "ILWD_Trf_Premium_Amt" },
+    { cbId: "ILWD_Trf_TopUp",    amtId: "ILWD_Trf_TopUp_Amt" },
+    { cbId: "ILWD_Trf_Loan",     amtId: "ILWD_Trf_Loan_Amt" },
+    { cbId: "ILWD_Trf_APL",      amtId: "ILWD_Trf_APL_Amt" }
+  ];
+
+  transferFields.forEach(({ cbId, amtId }) => {
+    const checkbox = document.getElementById(cbId);
+    const amtInput = document.getElementById(amtId);
+
+    if (!checkbox || !amtInput) return;
+
+    // Toggle visibility & clear data if unchecked
+    function toggleInputState() {
+      if (checkbox.checked) {
+        amtInput.style.display = "inline-block"; // Show textbox
+      } else {
+        amtInput.style.display = "none";         // Hide textbox
+        amtInput.value = "";                     // Erase text input
+        
+        // Remove amount from localStorage so it doesn't persist secretly
+        localStorage.removeItem(amtId);
+        
+        if (typeof showSaveStatus === "function") showSaveStatus();
+      }
+    }
+
+    // Listen for checkbox changes
+    checkbox.addEventListener("change", toggleInputState);
+
+    // Initial run on page load (with a slight delay so autoBindSave finishes restoring checkbox state)
+    setTimeout(toggleInputState, 50);
+  });
+});  
 
 /* ---------- Signature Names Display ---------- */
 document.addEventListener("DOMContentLoaded", () => {
