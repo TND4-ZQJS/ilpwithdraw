@@ -271,13 +271,13 @@
   <h2>E Banking Details</h2>
 
    <div class="row">
-      <label style="flex:1">Account Holder Name<input id="ILWD_EBank_Name" class="persist" type="text">
+      <label style="flex:1">Account Holder Name<input id="ILWD_EBank_Name" class="persist" type="text" placeholder="Enter name">
       </label>
    </div>
 
    <div class="row">
       <label style="flex:1">New IC/Old IC/Passport No/Co. Registration No. (as per bank’s records)
-        <input id="ILWD_EBank_NIRC" class="persist" type="text" placeholder="NIRC/Passport">
+        <input id="ILWD_EBank_NIRC" class="persist" type="text" placeholder="Entee NIRC/Passport no.">
       </label>
    </div>
 
@@ -694,19 +694,24 @@ function getPdfFormData() {
   return pdfData;
 }
 
-/* ---------- Auto-Fill Insured Name ---------- */
-$("same_as_insured").addEventListener('change', function() {
-    const insuredName = $("ILWD_Insured");
-    const poName = $("Nom_Nominee_PolicyOwner_Name");
+/* ---------- Auto-Fill E Banking Name & NIRC ---------- */
+const poName = document.getElementById('ILWD_PO_Name');
+const poNIRC = document.getElementById('ILWD_PO_NIRC');
+const eBankName = document.getElementById('ILWD_EBank_Name');
+const eBankNIRC = document.getElementById('ILWD_EBank_NIRC');
 
-    if (this.checked) {
-        poName.value = insuredName.value;
-        poName.readOnly = true;
-    } else {
-        poName.value = "";
-        poName.readOnly = false;
-    }
-    poName.dispatchEvent(new Event('input', { bubbles: true }));
+// Sync Policy Owner Name -> Bank Name
+poName.addEventListener('input', () => {
+  const val = poName.value;
+  eBankName.value = val;
+  localStorage.setItem('ILWD_EBank_Name', val);
+});
+
+// Sync Policy Owner NIRC -> Bank NIRC
+poNIRC.addEventListener('input', () => {
+  const val = poNIRC.value;
+  eBankNIRC.value = val;
+  localStorage.setItem('ILWD_EBank_NIRC', val);
 });
 
 /* ---------- Signature Engine ---------- */
