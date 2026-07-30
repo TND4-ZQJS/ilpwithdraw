@@ -239,16 +239,16 @@
      </div>
 
     
-    <section id="Trf_to_Other_Policy" style="display:none;">
+    <section id="Trf_to_Other_Policy">
     <div class="row"><h2>Transfer to Other Policy</h2><small class="muted">(After Transfer, (any)Balance to be credited into my bank account)</small></div>
 
     <div class="row">
     <label style="flex:1">Transfer the Partial Withdrawal amount
-      <input id="ILWD_Trf_Amount" type="text" class="persist" placeholder="Enter Amount (RM)">
+      <input id="ILWD_PolicyNo" type="text" class="persist" placeholder="Enter Amount (RM)">
     </label>
       
     <label style="flex:1">to Policy No.
-      <input id="ILWD_Trf_PolicyNo" type="text" class="persist" placeholder="Enter Policy No.">
+      <input id="ILWD_PolicyNo" type="text" class="persist" placeholder="Enter Policy No.">
     </label>
     </div>
 
@@ -803,11 +803,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }, 50);
 });
 
-/* ---------- Transfer to Policy Section & Options Engine ---------- */
+/* ---------- Transfer to Policy - Hide Options & Textbox ---------- */  
 document.addEventListener("DOMContentLoaded", () => {
-  const mainCB = document.getElementById("Trf_to_Other_Policy_CB");
-  const section = document.getElementById("Trf_to_Other_Policy");
-
   // Array of checkbox ID -> text input ID mappings
   const transferFields = [
     { cbId: "ILWD_Trf_FYPNewB", amtId: "ILWD_Trf_FYPNewB_Amt" },
@@ -817,96 +814,43 @@ document.addEventListener("DOMContentLoaded", () => {
     { cbId: "ILWD_Trf_APL",      amtId: "ILWD_Trf_APL_Amt" }
   ];
 
-  /* --------------------------------------------------------------------------
-     1. SUB-CHECKBOX TOGGLES (Show/Hide Amount Textboxes)
-     -------------------------------------------------------------------------- */
-  function updateSubFieldState({ cbId, amtId }) {
+  transferFields.forEach(({ cbId, amtId }) => {
     const checkbox = document.getElementById(cbId);
     const amtInput = document.getElementById(amtId);
 
     if (!checkbox || !amtInput) return;
 
-    if (checkbox.checked) {
-      amtInput.style.display = "inline-block"; // Show textbox
-    } else {
-      amtInput.style.display = "none";         // Hide textbox
-      amtInput.value = "";                     // Erase text input
-      localStorage.removeItem(amtId);          // Remove amount from localStorage
-    }
-  }
-
-  // Bind listeners and run initial state check for sub-fields
-  transferFields.forEach((fieldPair) => {
-    const checkbox = document.getElementById(fieldPair.cbId);
-    if (checkbox) {
-      checkbox.addEventListener("change", () => updateSubFieldState(fieldPair));
-    }
-  });
-
-
-  /* --------------------------------------------------------------------------
-     2. MAIN SECTION TOGGLE & DATA ERASER
-     -------------------------------------------------------------------------- */
-  function clearSectionData() {
-    if (!section) return;
-    const inputs = section.querySelectorAll("input, select, textarea");
-
-    inputs.forEach((input) => {
-      if (input.type === "checkbox" || input.type === "radio") {
-        input.checked = false;
+    // Toggle visibility & clear data if unchecked
+    function toggleInputState() {
+      if (checkbox.checked) {
+        amtInput.style.display = "inline-block"; // Show textbox
       } else {
-        input.value = "";
+        amtInput.style.display = "none";         // Hide textbox
+        amtInput.value = "";                     // Erase text input
+        
+        // Remove amount from localStorage so it doesn't persist secretly
+        localStorage.removeItem(amtId);
+        
+        if (typeof showSaveStatus === "function") showSaveStatus();
       }
-
-      // Hide amount textboxes explicitly
-      if (input.id.endsWith("_Amt")) {
-        input.style.display = "none";
-      }
-
-      // Remove saved keys from localStorage
-      if (input.id) {
-        localStorage.removeItem(input.id);
-      }
-    });
-
-    if (typeof showSaveStatus === "function") showSaveStatus();
-  }
-
-  function toggleMainSection() {
-    if (!mainCB || !section) return;
-
-    if (mainCB.checked) {
-      section.style.display = ""; // Show section
-      // Refresh sub-field visibility in case restored checkbox states need textboxes
-      transferFields.forEach(updateSubFieldState);
-    } else {
-      section.style.display = "none"; // Hide section
-      clearSectionData();             // Erase section inputs & localStorage
     }
-  }
 
-  if (mainCB) {
-    mainCB.addEventListener("change", toggleMainSection);
-  }
+    // Listen for checkbox changes
+    checkbox.addEventListener("change", toggleInputState);
 
-
-  /* --------------------------------------------------------------------------
-     3. INITIALIZATION (Delayed for autoBindSave restoration)
-     -------------------------------------------------------------------------- */
-  setTimeout(() => {
-    // 1. Evaluate sub-checkboxes first
-    transferFields.forEach(updateSubFieldState);
-    // 2. Evaluate main section visibility
-    toggleMainSection();
-  }, 50);
-});
+    // Initial run on page load (with a slight delay so autoBindSave finishes restoring checkbox state)
+    setTimeout(toggleInputState, 50);
+  });
+});  
 
 /* ---------- Signature Names Display ---------- */
 document.addEventListener("DOMContentLoaded", () => {
   const fieldMap = {
     "ILWD_PO_Name":      "ILWD_EBank_Name_Display",
-    "ILWD_Witness_Name": "ILWD_Witness_Name_Display",,
+    "ILWD_Witness_Name": "ILWD_Witness_Name_Display",
+    "ILWD_Witness_NIRC": "ILWD_Witness_NIRC_Display",
     "ILWD_Trustee_Name": "ILWD_Trustee_Name_Display",
+    "ILWD_Trustee_NIRC": "ILWD_Trustee_NIRC_Display"
   };
 
   function updateDisplay(storageKey, displayId, directValue = null) {
