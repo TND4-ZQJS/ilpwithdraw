@@ -159,6 +159,7 @@
   <label style="flex:1">NIRC/Passport No.
       <input id="ILWD_Insured_NIRC" type="text" class="persist" placeholder="Enter NIRC/Passport No.">
     </label>
+ </div>
 
       </section>
 
@@ -694,53 +695,102 @@ function getPdfFormData() {
   return pdfData;
 }
 
-/* ---------- Policy Owner -> EBank Data Sync Helper ---------- */
+/* ---------- Combined PO -> E-Bank & PO -> Insured Sync Helper ---------- */
 document.addEventListener("DOMContentLoaded", () => {
-  const poName  = document.getElementById("ILWD_PO_Name");
-  const poNric  = document.getElementById("ILWD_PO_NIRC");
+  // Elements
+  const poName    = document.getElementById("ILWD_PO_Name");
+  const poNric    = document.getElementById("ILWD_PO_NIRC");
 
   const eBankName = document.getElementById("ILWD_EBank_Name");
   const eBankNric = document.getElementById("ILWD_EBank_NIRC");
 
-  if (!poName || !poNric || !eBankName || !eBankNric) return;
+  const insuredPOCheckbox = document.getElementById("ILWD_Insured_is_PO");
+  const insuredName        = document.getElementById("ILWD_Insured_Name");
+  const insuredNric        = document.getElementById("ILWD_Insured_NIRC");
 
-  // Sync values and save to localStorage (forcing uppercase)
-  function syncEBankFromPO() {
-    const uppercaseName = poName.value.toUpperCase();
-    const uppercaseNric = poNric.value.toUpperCase();
+  // Helper to safely format value to Uppercase
+  const toUpper = (val) => (val || "").toUpperCase();
 
-    eBankName.value = uppercaseName;
-    eBankNric.value = uppercaseNric;
-
-    // Save directly to localStorage
-    localStorage.setItem(eBankName.id, uppercaseName);
-    localStorage.setItem(eBankNric.id, uppercaseNric);
-    
-    // Show save indicator if the function exists
-    if (typeof showSaveStatus === "function") {
-      showSaveStatus();
-    }
+  // Helper to update field + localStorage + save status
+  function setAndPersist(el, value) {
+    if (!el) return;
+    el.value = value;
+    localStorage.setItem(el.id, value);
+    if (typeof showSaveStatus === "function") showSaveStatus();
   }
 
-  // Set inputs to non-editable and apply visual dimming class
+  /* --- 1. E-BANK SYNC (Always Locked & Synced) --- */
+  function syncEBankFromPO() {
+    if (!eBankName || !eBankNric || !poName || !poNric) return;
+    setAndPersist(eBankName, toUpper(poName.value));
+    setAndPersist(eBankNric, toUpper(poNric.value));
+  }
+
   function lockEBankFields() {
+    if (!eBankName || !eBankNric) return;
     eBankName.readOnly = true;
     eBankNric.readOnly = true;
-
     eBankName.classList.add("dimmed");
     eBankNric.classList.add("dimmed");
   }
 
-  // 1. Lock the fields permanently (since PO is the only allowed account holder)
+  /* --- 2. INSURED SYNC (Conditional on Checkbox) --- */
+  function syncInsuredFromPO() {
+    if (!insuredName || !insuredNric || !poName || !poNric) return;
+    setAndPersist(insuredName, toUpper(poName.value));
+    setAndPersist(insuredNric, toUpper(poNric.value));
+  }
+
+  function setInsuredLocked(locked) {
+    if (!insuredName || !insuredNric) return;
+    insuredName.readOnly = locked;
+    insuredNric.readOnly = locked;
+    insuredName.classList.toggle("dimmed", locked);
+    insuredNric.classList.toggle("dimmed", locked);
+  }
+
+  function handleInsuredCheckboxChange() {
+    if (!insuredPOCheckbox) return;
+    
+    if (insuredPOCheckbox.checked) {
+      syncInsuredFromPO();
+      setInsuredLocked(true);
+    } else {
+      setInsuredLocked(false);
+    }
+  }
+
+  /* --- 3. EVENT BINDINGS & INITIALIZATION --- */
+  // Lock EBank fields permanently
   lockEBankFields();
 
-  // 2. Perform initial sync on page load to match restored PO values
-  syncEBankFromPO();
+  // Live Sync on Policy Owner Typing
+  if (poName) {
+    poName.addEventListener("input", () => {
+      syncEBankFromPO();
+      if (insuredPOCheckbox && insuredPOCheckbox.checked) syncInsuredFromPO();
+    });
+  }
 
-  // 3. Keep EBank fields in sync in real-time as Policy Owner types
-  poName.addEventListener("input", syncEBankFromPO);
-  poNric.addEventListener("input", syncEBankFromPO);
+  if (poNric) {
+    poNric.addEventListener("input", () => {
+      syncEBankFromPO();
+      if (insuredPOCheckbox && insuredPOCheckbox.checked) syncInsuredFromPO();
+    });
+  }
+
+  // Checkbox Event Listener
+  if (insuredPOCheckbox) {
+    insuredPOCheckbox.addEventListener("change", handleInsuredCheckboxChange);
+  }
+
+  // Initial Sync on Page Load (Handles restored localStorage state)
+  setTimeout(() => {
+    syncEBankFromPO();
+    handleInsuredCheckboxChange();
+  }, 50);
 });
+
 
 
 /* ---------- Signature Engine ---------- */
