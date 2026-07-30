@@ -155,12 +155,6 @@
     </label>
     </div>
      
- <div class="row">
-  <label style="flex:1">NIRC/Passport No.
-      <input id="ILWD_Insured_NIRC" type="text" class="persist" placeholder="Enter NIRC/Passport No.">
-    </label>
- </div>
-
       </section>
 
   <!-- Witness details -->
@@ -699,7 +693,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const insuredPOCheckbox = document.getElementById("ILWD_Insured_is_PO");
   const insuredName        = document.getElementById("ILWD_Insured_Name");
-  const insuredNric        = document.getElementById("ILWD_Insured_NIRC");
 
   // Helper to safely format value to Uppercase
   const toUpper = (val) => (val || "").toUpperCase();
@@ -737,23 +730,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* --- 2. INSURED SYNC (Conditional on Checkbox) --- */
   function syncInsuredFromPO() {
-    if (!insuredName || !insuredNric || !poName || !poNric) return;
+    if (!insuredName || !poName) return;
     setAndPersist(insuredName, toUpper(poName.value));
-    setAndPersist(insuredNric, toUpper(poNric.value));
   }
 
   function clearInsuredFields() {
-    if (!insuredName || !insuredNric) return;
+    if (!insuredName) return;
     clearAndRemovePersist(insuredName);
-    clearAndRemovePersist(insuredNric);
   }
 
   function setInsuredLocked(locked) {
-    if (!insuredName || !insuredNric) return;
+    if (!insuredName) return;
     insuredName.readOnly = locked;
-    insuredNric.readOnly = locked;
     insuredName.classList.toggle("dimmed", locked);
-    insuredNric.classList.toggle("dimmed", locked);
   }
 
   function handleInsuredCheckboxChange() {
@@ -784,7 +773,6 @@ document.addEventListener("DOMContentLoaded", () => {
   if (poNric) {
     poNric.addEventListener("input", () => {
       syncEBankFromPO();
-      if (insuredPOCheckbox && insuredPOCheckbox.checked) syncInsuredFromPO();
     });
   }
 
