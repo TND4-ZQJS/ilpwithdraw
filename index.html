@@ -794,41 +794,61 @@ document.addEventListener("DOMContentLoaded", () => {
   }, 50);
 });
 
+/* ---------- Signature Names Display ---------- */
 document.addEventListener("DOMContentLoaded", () => {
   const fieldMap = {
-    "ILWD_PO_Name": "ILWD_EBank_Name_Display",
+    "ILWD_PO_Name":      "ILWD_EBank_Name_Display",
     "ILWD_Witness_Name": "ILWD_Witness_Name_Display",
+    "ILWD_Witness_NIRC": "ILWD_Witness_NIRC_Display",
     "ILWD_Trustee_Name": "ILWD_Trustee_Name_Display",
-
+    "ILWD_Trustee_NIRC": "ILWD_Trustee_NIRC_Display"
   };
 
   function updateDisplay(storageKey, displayId, directValue = null) {
     const displayEl = document.getElementById(displayId);
     if (!displayEl) return;
 
-    // 1. Priority: direct typed value from input event
-    // 2. Fallback: input field value in DOM
-    // 3. Fallback: localStorage item
     const sourceInput = document.getElementById(storageKey);
+    
+    // Priority:
+    // 1. Direct typed value (if from live typing event)
+    // 2. localStorage value
+    // 3. Current input DOM value
+    const savedInStorage = localStorage.getItem(storageKey);
+    const inputVal = sourceInput ? sourceInput.value : "";
+    
     const value = (directValue !== null) 
       ? directValue 
-      : (sourceInput ? sourceInput.value : localStorage.getItem(storageKey));
+      : (savedInStorage || inputVal);
 
     displayEl.textContent = value ? value.toUpperCase() : "-";
   }
 
-  // Initial load on page mount
-  Object.entries(fieldMap).forEach(([storageKey, displayId]) => {
-    updateDisplay(storageKey, displayId);
+  function refreshAllDisplays() {
+    Object.entries(fieldMap).forEach(([storageKey, displayId]) => {
+      updateDisplay(storageKey, displayId);
+    });
+  }
 
+  // Bind live typing listeners to inputs
+  Object.entries(fieldMap).forEach(([storageKey, displayId]) => {
     const sourceInput = document.getElementById(storageKey);
     if (sourceInput) {
-      // Use e.target.value so we get the immediate keypress character
       sourceInput.addEventListener("input", (e) => {
         updateDisplay(storageKey, displayId, e.target.value);
       });
+      // Also listen for change/restore events
+      sourceInput.addEventListener("change", () => {
+        updateDisplay(storageKey, displayId);
+      });
     }
   });
+
+  // 1. Immediate update
+  refreshAllDisplays();
+
+  // 2. Delayed update (wait 100ms for autoBindSave / restoration script to finish putting localStorage values into the DOM inputs)
+  setTimeout(refreshAllDisplays, 100);
 });
 
 /* ---------- Signature Engine ---------- */
