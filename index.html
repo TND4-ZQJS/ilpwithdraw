@@ -1097,10 +1097,18 @@ async function fillPDF(templateFileName, action = 'download') {
     const pdfDoc = await PDFLib.PDFDocument.load(existingPdfBytes);
     const form = pdfDoc.getForm(); // <-- FIXED: Form initialization added
 
-    // Section A Policy Details
+    // Policy and People
     safeSetText(form, "ILWD_PolicyNo", getValue("ILWD_PolicyNo"));
     safeSetText(form, "ILWD_Insured_Name", getValue("ILWD_Insured_Name"));
     safeSetText(form, "ILWD_Reason", getValue("ILWD_Reason"));
+    safeSetText(form, "ILWD_PO_NIRC", getValue("ILWD_PO_NIRC"));
+    safeSetText(form, "ILWD_PO_Name", getValue("ILWD_PO_Name"));
+    safeSetText(form, "ILWD_PO_Mobile", getValue("ILWD_PO_Mobile"));
+    safeSetText(form, "ILWD_Witness_Name", getValue("ILWD_Witness_Name"));
+    safeSetText(form, "ILWD_Witness_NIRC", getValue("ILWD_Witness_NIRC"));
+    safeSetText(form, "ILWD_Witness_Mobile", getValue("ILWD_Witness_Mobile"));
+    safeSetText(form, "ILWD_Trustee_Name", getValue("ILWD_Trustee_Name"));
+    safeSetText(form, "ILWD_Trustee_NIRC", getValue("ILWD_Trustee_NIRC"));
 
     // Dynamic Fund Details mapping (if function exists)
     if (typeof getPdfFormData === "function") {
@@ -1135,7 +1143,7 @@ async function fillPDF(templateFileName, action = 'download') {
 
     // Embed Signatures (if function exists)
     if (typeof embedSignatureToPdf === "function") {
-      const targetPageIndex = 3; 
+      const targetPageIndex = 2; 
       await embedSignatureToPdf(pdfDoc, targetPageIndex, { role: "owner",   x: 50,  y: 240, factor: 0.40 });
       await embedSignatureToPdf(pdfDoc, targetPageIndex, { role: "trustee", x: 240, y: 240, factor: 0.40 });
       await embedSignatureToPdf(pdfDoc, targetPageIndex, { role: "witness", x: 420, y: 240, factor: 0.40 });
