@@ -1099,7 +1099,7 @@ async function fillPDF(templateFileName, action = 'download') {
 
     // Section A Policy Details
     safeSetText(form, "ILWD_PolicyNo", getValue("ILWD_PolicyNo"));
-    safeSetText(form, "ILWD_Insured", getValue("ILWD_Insured"));
+    safeSetText(form, "ILWD_Insured_Name", getValue("ILWD_Insured_Name"));
     safeSetText(form, "ILWD_Reason", getValue("ILWD_Reason"));
 
     // Dynamic Fund Details mapping (if function exists)
