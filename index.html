@@ -51,6 +51,34 @@
   }
 }
 
+      /* Generate PDF Page*/
+.action-center {max-width: 800px;margin: 40px auto;padding: 0 20px; /* Provides consistent side-spacing on mobile */box-sizing: border-box;}
+.pdf-grid {display: flex;flex-direction: column;gap: 12px;}
+.doc-row {display: flex;align-items: center;justify-content: space-between;background: #ffffff;padding: 16px;border-radius: 14px;border: 1px solid #d2d2d7;box-sizing: border-box;}
+.doc-info {display: flex;flex-direction: column;}
+.doc-title { font-size: 15px; color: #1d1d1f; }
+.doc-sub { font-size: 12px; color: #86868b; }
+
+/* Generate PDF Button Styles */
+.btn-primary { background: #0071e3; color: #fff; border: none; padding: 8px 16px; border-radius: 18px; font-weight: 500; cursor: pointer; }
+.btn-secondary { background: #f5f5f7; color: #0071e3; border: none; padding: 8px 16px; border-radius: 18px; font-weight: 500; cursor: pointer; margin-right: 4px; }
+.btn-reset { background: none; color: #ff3b30; border: 1px solid #ff3b30; padding: 12px 24px; border-radius: 22px; font-weight: 600; cursor: pointer; transition: 0.2s; width: 100%; max-width: 300px; }
+.btn-secondary:focus {outline: none;background: #f5f5f7; /* Keeps the original Apple-grey background */color: #0071e3;}
+
+/* Optional: Slight darken effect ONLY while the mouse is actually held down */
+.btn-secondary:active {background: #e8e8ed; transition: 0.1s;}
+
+/* Hover effect for better UX */
+.btn-secondary:hover {background: #ebebed;}
+.reset-container {text-align: center;margin-top: 40px;padding-top: 20px;border-top: 1px solid #d2d2d7;}
+
+/* MOBILE ALIGNMENT FIX */
+@media (max-width: 600px) {
+  .doc-row {flex-direction: column;align-items: flex-start;gap: 15px;}
+  .actions {width: 100%;display: flex;justify-content: space-between;}
+  .actions button {flex: 1;text-align: center;}
+}
+
   /* Signature preview tiles */
   .sig-preview{
     width:100%; height:150px; border:1px dashed #bbb; border-radius:10px;
@@ -415,10 +443,29 @@
     </div>
   </section>
 
-  <section class="section actions">
-    <button id="generate" type="button">Generate PDF</button>
-    <button id="resetAll" type="button" class="secondary">Reset All</button>
+  <section class="section">
+    <div class="action-center">
+      <div class="pdf-grid">
+        <div class="doc-row">
+          <div class="doc-info">
+            <b class="doc-title">Investmenr-linked Withdrawal Form</b>
+            <span class="doc-sub">LF1042 · 1 Page (upload into EPOS)</span> <!-- Cleaned up subtitle -->
+          </div>
+          <div class="actions">
+           
+            <button onclick="fillPDF('investment-link-partial-withdrawal_LF4069_21102024_fillable.pdff', 'view')" class="btn-secondary">View</button>
+            <button onclick="fillPDF('investment-link-partial-withdrawal_LF4069_21102024_fillable.pdf', 'download')" class="btn-primary">Download</button>
+          </div>
+        </div>
+      </div>
+    
+
+      <div class="reset-container">
+        <button onclick="resetAllData()" class="btn-reset">Reset All Fields & Signatures</button>
+      </div>
+    </div> <!-- Close action-center -->
   </section>
+
 
 </main>
 
@@ -1022,126 +1069,151 @@ function initSignatureFields() {
 }
 
 /* ---------- Generate PDF ---------- */
-async function fillPDF(){
-  try {
-    $("generate").disabled = true;
+async function fillPDF(templateFileName, action = 'download') {
+  // Grab action buttons to disable them during generation
+  const actionButtons = document.querySelectorAll('.actions button');
+  actionButtons.forEach(btn => btn.disabled = true);
 
-    const res = await fetch(PDF_FILENAME);
-    if (!res.ok) throw new Error("Cannot load PDF: " + PDF_FILENAME);
-    const bytes = await res.arrayBuffer();
-    const pdfDoc = await PDFLib.PDFDocument.load(bytes);
-    const form = pdfDoc.getForm();
+  // Helper function to safely fetch input DOM values without crashing on missing elements
+  const getValue = (id) => {
+    const el = document.getElementById(id);
+    return el ? el.value : "";
+  };
+
+  const getChecked = (id) => {
+    const el = document.getElementById(id);
+    return el ? el.checked : false;
+  };
+
+  try {
+    // 1. Fetch template PDF
+    const response = await fetch(templateFileName);
+    if (!response.ok) {
+      throw new Error(`Failed to load template file: ${templateFileName}`);
+    }
+    const existingPdfBytes = await response.arrayBuffer();
+
+    // 2. Load PDF document & get interactive form
+    const pdfDoc = await PDFLib.PDFDocument.load(existingPdfBytes);
+    const form = pdfDoc.getForm(); // <-- FIXED: Form initialization added
 
     // Section A Policy Details
-    safeSetText(form, "ILWD_PolicyNo", $("ILWD_PolicyNo").value);
-    safeSetText(form, "ILWD_Insured", $("ILWD_Insured").value);
-    safeSetText(form, "ILWD_Reason", $("ILWD_Reason").value);
+    safeSetText(form, "ILWD_PolicyNo", getValue("ILWD_PolicyNo"));
+    safeSetText(form, "ILWD_Insured", getValue("ILWD_Insured"));
+    safeSetText(form, "ILWD_Reason", getValue("ILWD_Reason"));
 
-    // Dynamic Fund Details mapping
-    const fundData = getPdfFormData();
-    Object.keys(fundData).forEach(fieldId => {
-      safeSetText(form, fieldId, fundData[fieldId]);
-    });
+    // Dynamic Fund Details mapping (if function exists)
+    if (typeof getPdfFormData === "function") {
+      const fundData = getPdfFormData();
+      Object.keys(fundData).forEach(fieldId => {
+        safeSetText(form, fieldId, fundData[fieldId]);
+      });
+    }
 
     // E-Banking details
-    safeSetText(form, "ClmMed_EBank_Name", $("ClmMed_EBank_Name").value);
-    safeSetText(form, "ClmMed_EBank_NIRC", $("ClmMed_EBank_NIRC").value);
-    safeSetText(form, "ClmMed_EBank_AccNo", $("ClmMed_EBank_AccNo").value);
-    safeSetText(form, "ClmMed_EBank_Bank", $("ClmMed_EBank_Bank").value);
-    safeCheck(form, "ClmMed_EBank_Conventional", $("ClmMed_EBank_Conventional").checked);
-    safeCheck(form, "ClmMed_EBank_Islamic", $("ClmMed_EBank_Islamic").checked);
+    safeSetText(form, "ClmMed_EBank_Name", getValue("ClmMed_EBank_Name"));
+    safeSetText(form, "ClmMed_EBank_NIRC", getValue("ClmMed_EBank_NIRC"));
+    safeSetText(form, "ClmMed_EBank_AccNo", getValue("ClmMed_EBank_AccNo"));
+    safeSetText(form, "ClmMed_EBank_Bank", getValue("ClmMed_EBank_Bank"));
+    safeCheck(form, "ClmMed_EBank_Conventional", getChecked("ClmMed_EBank_Conventional"));
+    safeCheck(form, "ClmMed_EBank_Islamic", getChecked("ClmMed_EBank_Islamic"));
 
     // Section C - Signing Details 
-    safeSetText(form, "Nom_Nominee_SignState", $("Nom_Nominee_SignState").value);
-    safeSetText(form, "Nom_Nominee_SignDay", $("Nom_Nominee_SignDay").value);
-    safeSetText(form, "Nom_Nominee_SignMonth", $("Nom_Nominee_SignMonth").value);
-    safeSetText(form, "Nom_Nominee_SignYear", $("Nom_Nominee_SignYear").value);
+    safeSetText(form, "Nom_Nominee_SignState", getValue("Nom_Nominee_SignState"));
+    safeSetText(form, "Nom_Nominee_SignDay", getValue("Nom_Nominee_SignDay"));
+    safeSetText(form, "Nom_Nominee_SignMonth", getValue("Nom_Nominee_SignMonth"));
+    safeSetText(form, "Nom_Nominee_SignYear", getValue("Nom_Nominee_SignYear"));
 
-    safeSetText(form, "Nom_Nominee_PolicyOwner_Name", $("Nom_Nominee_PolicyOwner_Name").value);
-    safeSetText(form, "Nom_Nominee_PolicyOwner_NRIC", $("Nom_Nominee_PolicyOwner_NRIC").value);
-    safeSetText(form, "Nom_Nominee_Trustee_Name", $("Nom_Nominee_Trustee_Name").value);
-    safeSetText(form, "Nom_Nominee_Trustee_NIRC", $("Nom_Nominee_Trustee_NIRC").value);
+    safeSetText(form, "Nom_Nominee_PolicyOwner_Name", getValue("Nom_Nominee_PolicyOwner_Name"));
+    safeSetText(form, "Nom_Nominee_PolicyOwner_NRIC", getValue("Nom_Nominee_PolicyOwner_NRIC"));
+    safeSetText(form, "Nom_Nominee_Trustee_Name", getValue("Nom_Nominee_Trustee_Name"));
+    safeSetText(form, "Nom_Nominee_Trustee_NIRC", getValue("Nom_Nominee_Trustee_NIRC"));
 
-    safeSetText(form, "Nom_Nominee_Witness_Name", $("Nom_Nominee_Witness_Name").value);
-    safeSetText(form, "Nom_Nominee_Witness_NIRC", $("Nom_Nominee_Witness_NIRC").value);
-    safeSetText(form, "Nom_Nominee_Witness_Mobile", $("Nom_Nominee_Witness_Mobile").value);
+    safeSetText(form, "Nom_Nominee_Witness_Name", getValue("Nom_Nominee_Witness_Name"));
+    safeSetText(form, "Nom_Nominee_Witness_NIRC", getValue("Nom_Nominee_Witness_NIRC"));
+    safeSetText(form, "Nom_Nominee_Witness_Mobile", getValue("Nom_Nominee_Witness_Mobile"));
 
-    // Embed Signatures
-    const targetPageIndex = 3; 
-    await embedSignatureToPdf(pdfDoc, targetPageIndex, { role: "owner",   x: 50,  y: 240, factor: 0.40 });
-    await embedSignatureToPdf(pdfDoc, targetPageIndex, { role: "trustee", x: 240, y: 240, factor: 0.40 });
-    await embedSignatureToPdf(pdfDoc, targetPageIndex, { role: "witness", x: 420, y: 240, factor: 0.40 });
+    // Embed Signatures (if function exists)
+    if (typeof embedSignatureToPdf === "function") {
+      const targetPageIndex = 3; 
+      await embedSignatureToPdf(pdfDoc, targetPageIndex, { role: "owner",   x: 50,  y: 240, factor: 0.40 });
+      await embedSignatureToPdf(pdfDoc, targetPageIndex, { role: "trustee", x: 240, y: 240, factor: 0.40 });
+      await embedSignatureToPdf(pdfDoc, targetPageIndex, { role: "witness", x: 420, y: 240, factor: 0.40 });
+    }
 
+    // 3. Save modified PDF bytes & create Blob URL
     const pdfBytes = await pdfDoc.save();
+    const blob = new Blob([pdfBytes], { type: "application/pdf" });
+    const url = URL.createObjectURL(blob);
 
-    const policyInput = $("ILWD_PolicyNo");
+    // 4. Construct output filename with policy number fallback
+    const policyVal = getValue("ILWD_PolicyNo");
     let policyNum = "NEW";
-    if (policyInput && policyInput.value.trim() !== "") {
-      policyNum = policyInput.value.trim().replace(/[^a-z0-9]/gi, '_');
+
+    if (policyVal.trim() !== "") {
+      policyNum = policyVal.trim().replace(/[^a-z0-9]/gi, '_');
+    } else {
+      const savedPolicy = localStorage.getItem("ILWD_PolicyNo");
+      if (savedPolicy && savedPolicy.trim() !== "") {
+        policyNum = savedPolicy.trim().replace(/[^a-z0-9]/gi, '_');
+      }
     }
 
     const finalFileName = `${policyNum}_FundWithdrawal.pdf`;
 
-    const blob = new Blob([pdfBytes], { type: "application/pdf" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a"); 
-    a.href = url; 
-    a.download = finalFileName;
-    
-    document.body.appendChild(a); 
-    a.click(); 
-    a.remove();
-    
-    setTimeout(()=> URL.revokeObjectURL(url), 2500);
+    // 5. Execute action (View in new tab OR Force Download)
+    if (action === 'view') {
+      window.open(url, '_blank');
+    } else {
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = finalFileName;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    }
 
-  } catch(err){
-    alert("PDF generation failed: " + (err.message || err));
-    console.error(err);
-  } finally {
-    $("generate").disabled = false;
-  }
-}
+    // 6. Clean up Blob URL memory leak after 5 seconds
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
 
-async function embedSignatureToPdf(pdfDoc, pageIndex, { role, x, y, factor = 0.40 }) {
-  const sigData = localStorage.getItem(`sig_${FORM_ID}_${role}`);
-  if (!sigData) return;
-
-  try {
-    const pages = pdfDoc.getPages();
-    const targetPage = pages[Math.min(pageIndex, pages.length - 1)];
-
-    const img = await pdfDoc.embedPng(sigData);
-    const { width, height } = img.size();
-
-    const previewEl = document.querySelector(`[data-sig-role="${role}"] [data-sig-preview]`);
-    const boxW = previewEl?.offsetWidth || 150;
-    const boxH = previewEl?.offsetHeight || 50;
-
-    const scale = Math.min(boxW / width, boxH / height);
-    const drawW = width * scale * factor;
-    const drawH = height * scale * factor;
-
-    targetPage.drawImage(img, { x, y, width: drawW, height: drawH });
   } catch (err) {
-    console.error(`Failed to embed signature for role "${role}":`, err);
+    console.error("Critical PDF Error:", err);
+    alert("PDF generation failed: " + (err.message || err));
+  } finally {
+    // Re-enable action buttons
+    actionButtons.forEach(btn => btn.disabled = false);
   }
 }
+
 
 /* ---------- RESET ALL DATA ---------- */
-function resetAll() {
+// Function renamed to resetAllData to match HTML button onclick="resetAllData()"
+function resetAllData() {
   if (!confirm("Are you sure you want to reset the form? All saved data will be cleared.")) return;
 
+  // Clear localStorage
   localStorage.clear();
 
+  // Reset inputs
   document.querySelectorAll("input, select, textarea").forEach(el => {
-    if (el.type === "checkbox" || el.type === "radio") el.checked = false;
-    else el.value = "";
+    if (el.type === "checkbox" || el.type === "radio") {
+      el.checked = false;
+    } else {
+      el.value = "";
+    }
   });
 
-  container.innerHTML = "";
-  selectedFundKeys.clear();
-  createFundRow();
+  // Re-hide conditional sections
+  const trfSection = document.getElementById("Trf_to_Other_Policy");
+  if (trfSection) trfSection.style.display = "none";
 
+  // Reset dynamic fund rows if present
+  const fundContainer = document.getElementById("fund-rows-container") || (typeof container !== "undefined" ? container : null);
+  if (fundContainer) fundContainer.innerHTML = "";
+  if (typeof selectedFundKeys !== "undefined" && selectedFundKeys.clear) selectedFundKeys.clear();
+  if (typeof createFundRow === "function") createFundRow();
+
+  // Reset Signature Previews
   document.querySelectorAll("[data-sig-role]").forEach(block => {
     const role = block.dataset.sigRole;
     const previewEl = block.querySelector("[data-sig-preview]");
@@ -1150,12 +1222,10 @@ function resetAll() {
     }
   });
 
-  showSaveStatus();
+  if (typeof showSaveStatus === "function") showSaveStatus();
 }
 
-/* ---------- Wire buttons ---------- */
-$("generate").addEventListener("click", fillPDF);
-$("resetAll").addEventListener("click", resetAll);
+
 </script>
 </body>
 </html>
