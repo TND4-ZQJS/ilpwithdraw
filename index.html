@@ -1068,6 +1068,55 @@ function initSignatureFields() {
   });
 }
 
+async function embedSignatureToPdf(pdfDoc, pageIndex, options) {
+  const { role, x, y, factor = 0.40 } = options;
+
+  // 1. Construct localStorage key matching your signature engine format
+  // Tries `sig_${FORM_ID}_${role}`, then `sig_${role}`, then `${role}`
+  const formId = typeof FORM_ID !== "undefined" ? FORM_ID : "ILWD";
+  const primaryKey = `sig_${formId}_${role}`;
+  
+  let sigDataUri = localStorage.getItem(primaryKey) 
+                || localStorage.getItem(`sig_${role}`) 
+                || localStorage.getItem(role);
+
+  // 2. Validate data format
+  if (!sigDataUri || !sigDataUri.startsWith("data:image/png")) {
+    console.warn(`No valid PNG signature found for role: ${role} (key tried: ${primaryKey})`);
+    return;
+  }
+
+  try {
+    // 3. Embed PNG into pdf-lib
+    const img = await pdfDoc.embedPng(sigDataUri);
+    const originalSize = img.size();
+
+    // 4. Calculate dimensions maintaining aspect ratio
+    const baseWidth = 250;
+    const aspectRatio = originalSize.width / originalSize.height;
+    const renderWidth = baseWidth * factor;
+    const renderHeight = (baseWidth / aspectRatio) * factor;
+
+    // 5. Get target page (pdf-lib pages are 0-indexed)
+    const pages = pdfDoc.getPages();
+    const targetPage = pages[pageIndex];
+
+    if (targetPage) {
+      targetPage.drawImage(img, {
+        x: x,
+        y: y,
+        width: renderWidth,
+        height: renderHeight
+      });
+    } else {
+      console.error(`Page index ${pageIndex} does not exist in the PDF template.`);
+    }
+  } catch (err) {
+    console.error(`Error embedding signature for role ${role}:`, err);
+  }
+}
+
+
 /* ---------- Generate PDF ---------- */
 async function fillPDF(templateFileName, action = 'download') {
   // Grab action buttons to disable them during generation
@@ -1141,13 +1190,14 @@ async function fillPDF(templateFileName, action = 'download') {
     safeSetText(form, "Nom_Nominee_Witness_NIRC", getValue("Nom_Nominee_Witness_NIRC"));
     safeSetText(form, "Nom_Nominee_Witness_Mobile", getValue("Nom_Nominee_Witness_Mobile"));
 
-    // Embed Signatures (if function exists)
-    if (typeof embedSignatureToPdf === "function") {
-      const targetPageIndex = 2; 
-      await embedSignatureToPdf(pdfDoc, targetPageIndex, { role: "owner",   x: 50,  y: 240, factor: 0.40 });
-      await embedSignatureToPdf(pdfDoc, targetPageIndex, { role: "trustee", x: 240, y: 240, factor: 0.40 });
-      await embedSignatureToPdf(pdfDoc, targetPageIndex, { role: "witness", x: 420, y: 240, factor: 0.40 });
-    }
+    // Embed Signatures (Note: 0-indexed page numbering)
+    // For Page 1 use 0, Page 2 use 1, Page 3 use 2
+    const targetPageIndex = 2; // Adjust this index to match the target page in your PDF template
+
+    await embedSignatureToPdf(pdfDoc, targetPageIndex, { role: "owner",   x: 50,  y: 240, factor: 0.40 });
+    await embedSignatureToPdf(pdfDoc, targetPageIndex, { role: "trustee", x: 240, y: 240, factor: 0.40 });
+    await embedSignatureToPdf(pdfDoc, targetPageIndex, { role: "witness", x: 420, y: 240, factor: 0.40 });
+
 
     // 3. Save modified PDF bytes & create Blob URL
     const pdfBytes = await pdfDoc.save();
