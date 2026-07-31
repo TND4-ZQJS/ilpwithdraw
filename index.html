@@ -455,9 +455,9 @@
   </div>
 
   <div class="row">
-  <span style="font-weight: 600; font-size: 0.95rem;">Date Signed</span>
-  <button type="button" class="btn-set-today" onclick="setSignedDateToday()">Today</button>
+  <button type="button" class="btn-set-today ghost" onclick="setSignedDateToday()">Today</button>
 </div>
+  
   <div class="row">
     <label style="flex:1">Day
       <select id="ILWD_Signed_Day" class="persist">
@@ -1084,6 +1084,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setTimeout(refreshAllDisplays, 100);
 });
 
+/* ---------- Date Set Today Button ---------- */  
 function setSignedDateToday() {
   const now = new Date();
 
