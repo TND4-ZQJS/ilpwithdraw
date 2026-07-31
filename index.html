@@ -1268,8 +1268,8 @@ async function fillPDF(templateFileName, action = 'download') {
     safeSetText(form, "ClmMed_EBank_NIRC", getValue("ClmMed_EBank_NIRC"));
     safeSetText(form, "ClmMed_EBank_AccNo", getValue("ClmMed_EBank_AccNo"));
     safeSetText(form, "ClmMed_EBank_Bank", getValue("ClmMed_EBank_Bank"));
-    safeCheck(form, "ClmMed_EBank_Conventional", getChecked("ClmMed_EBank_Conventional"));
-    safeCheck(form, "ClmMed_EBank_Islamic", getChecked("ClmMed_EBank_Islamic"));
+    safeCheck(form, "ILWD_EBank_Conventional", getChecked("ILWD_EBank_Conventional"));
+    safeCheck(form, "ILWD_EBank_Islamic", getChecked("ILWD_EBank_Islamic"));
 
     // Section C - Signing Details 
     safeSetText(form, "Nom_Nominee_SignState", getValue("Nom_Nominee_SignState"));
