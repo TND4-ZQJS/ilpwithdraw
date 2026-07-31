@@ -1263,28 +1263,35 @@ async function fillPDF(templateFileName, action = 'download') {
       });
     }
 
+    // Transfer to Other Policy
+    safeSetText(form, "ILWD_Trf_Amount", getValue("ILWD_Trf_Amoun"));
+    safeSetText(form, "ILWD_Trf_PolicyNo", getValue("ILWD_Trf_PolicyNo"));
+    safeSetText(form, "ILWD_Trf_FYPNewB_Amt", getValue("ILWD_Trf_FYPNewB_Amt"));
+    safeSetText(form, "ILWD_Trf_Premium_Amt", getValue("ILWD_Trf_Premium_Amt"));
+    safeSetText(form, "ILWD_Trf_TopUp_Amt", getValue("ILWD_Trf_TopUp_Amt"));
+    safeSetText(form, "ILWD_Trf_Loan_Amt", getValue("ILWD_Trf_Loan_Amt"));
+    safeSetText(form, "ILWD_Trf_APL_Amt", getValue("ILWD_Trf_APL_Amt"));
+    safeCheck(form, "LWD_Trf_FYPNewB", getChecked("LWD_Trf_FYPNewB"));
+    safeCheck(form, "ILWD_Trf_TopUp", getChecked("ILWD_Trf_TopUp"));
+    safeCheck(form, "ILWD_Trf_Loan", getChecked("ILWD_Trf_Loan"));
+    safeCheck(form, "ILWD_Trf_APL", getChecked("ILWD_Trf_APL"));
+    safeCheck(form, "ILWD_Trf_Premium", getChecked("ILWD_Trf_Premium"));
+  
+
     // E-Banking details
-    safeSetText(form, "ClmMed_EBank_Name", getValue("ClmMed_EBank_Name"));
-    safeSetText(form, "ClmMed_EBank_NIRC", getValue("ClmMed_EBank_NIRC"));
-    safeSetText(form, "ClmMed_EBank_AccNo", getValue("ClmMed_EBank_AccNo"));
-    safeSetText(form, "ClmMed_EBank_Bank", getValue("ClmMed_EBank_Bank"));
+    safeSetText(form, "ILWD_EBank_AccNo", getValue("ILWD_EBank_AccNo"));
+    safeSetText(form, "ILWD_EBank_Bank", getValue("ILWD_EBank_Bank"));
+    safeSetText(form, "ILWD_EBank_Name", getValue("ILWD_EBank_Name"));
+    safeSetText(form, "ILWD_EBank_NIRC", getValue("ILWD_EBank_NIRC"));
     safeCheck(form, "ILWD_EBank_Conventional", getChecked("ILWD_EBank_Conventional"));
     safeCheck(form, "ILWD_EBank_Islamic", getChecked("ILWD_EBank_Islamic"));
+    safeCheck(form, "ILWD_EBank_Checkbox", getChecked("ILWD_EBank_Checkbox"));
 
     // Section C - Signing Details 
-    safeSetText(form, "Nom_Nominee_SignState", getValue("Nom_Nominee_SignState"));
-    safeSetText(form, "Nom_Nominee_SignDay", getValue("Nom_Nominee_SignDay"));
-    safeSetText(form, "Nom_Nominee_SignMonth", getValue("Nom_Nominee_SignMonth"));
-    safeSetText(form, "Nom_Nominee_SignYear", getValue("Nom_Nominee_SignYear"));
-
-    safeSetText(form, "Nom_Nominee_PolicyOwner_Name", getValue("Nom_Nominee_PolicyOwner_Name"));
-    safeSetText(form, "Nom_Nominee_PolicyOwner_NRIC", getValue("Nom_Nominee_PolicyOwner_NRIC"));
-    safeSetText(form, "Nom_Nominee_Trustee_Name", getValue("Nom_Nominee_Trustee_Name"));
-    safeSetText(form, "Nom_Nominee_Trustee_NIRC", getValue("Nom_Nominee_Trustee_NIRC"));
-
-    safeSetText(form, "Nom_Nominee_Witness_Name", getValue("Nom_Nominee_Witness_Name"));
-    safeSetText(form, "Nom_Nominee_Witness_NIRC", getValue("Nom_Nominee_Witness_NIRC"));
-    safeSetText(form, "Nom_Nominee_Witness_Mobile", getValue("Nom_Nominee_Witness_Mobile"));
+    safeSetText(form, "ILWD_Signed_State", getValue("ILWD_Signed_State"));
+    safeSetText(form, "ILWD_Signed_Day", getValue("ILWD_Signed_Day"));
+    safeSetText(form, "ILWD_Signed_Month", getValue("ILWD_Signed_Month"));
+    safeSetText(form, "ILWD_Signed_Year", getValue("ILWD_Signed_Year"));
 
     // Embed Signatures (Note: 0-indexed page numbering)
     // For Page 1 use 0, Page 2 use 1, Page 3 use 2
