@@ -1493,9 +1493,9 @@ indicatorSteps.forEach((stepCircle, index) => {
 
 // 3. Updated Navigation Function
 function navigateTo(index) {
-  // Hide current
-  steps[currentStep].classList.remove("active");
-  indicatorSteps[currentStep].classList.remove("active");
+  // Clear 'active' from ALL steps & indicators to override hardcoded HTML
+  steps.forEach(step => step.classList.remove("active"));
+  indicatorSteps.forEach(ind => ind.classList.remove("active"));
 
   // Update Index
   currentStep = index;
@@ -1503,23 +1503,26 @@ function navigateTo(index) {
   // Persist current step to localStorage
   localStorage.setItem("wizardCurrentStep", currentStep);
 
-  // Show new
+  // Apply active class to current step
   steps[currentStep].classList.add("active");
   indicatorSteps[currentStep].classList.add("active");
 
   // Handle "Previous" button visibility
-  prevBtn.style.visibility = (currentStep === 0) ? "hidden" : "visible";
+  if (prevBtn) prevBtn.style.visibility = (currentStep === 0) ? "hidden" : "visible";
 
   // Handle "Next" button: Hide it completely on the final step
-  if (currentStep === steps.length - 1) {
-    nextBtn.style.display = "none";
-  } else {
-    nextBtn.style.display = "block";
-    nextBtn.innerText = "Next Step";
+  if (nextBtn) {
+    if (currentStep === steps.length - 1) {
+      nextBtn.style.display = "none";
+    } else {
+      nextBtn.style.display = "block";
+      nextBtn.innerText = "Next Step";
+    }
   }
 
   // Smooth scroll to top of the card
-  document.querySelector('main').scrollIntoView({ behavior: 'smooth' });
+  const mainContent = document.querySelector('main');
+  if (mainContent) mainContent.scrollIntoView({ behavior: 'smooth' });
 }
 
 // 4. Updated Next/Back logic
@@ -1532,11 +1535,10 @@ function changeStep(n) {
   }
 }
 
-// 5. Initial rendering call to show saved active step on page load
+// 5. Force UI to match saved step as soon as DOM is ready
 document.addEventListener("DOMContentLoaded", () => {
   navigateTo(currentStep);
 });
-
 
 
 </script>
