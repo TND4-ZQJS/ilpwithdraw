@@ -1474,21 +1474,24 @@ function resetAllData() {
   if (typeof showSaveStatus === "function") showSaveStatus();
 }
 
-//WIZARD TRACKER LOGIC
+// WIZARD TRACKER LOGIC
 const steps = document.querySelectorAll(".wizard-step");
 const indicatorSteps = document.querySelectorAll(".step");
 const nextBtn = document.getElementById("nextBtn");
 const prevBtn = document.getElementById("prevBtn");
-let currentStep = 0;
 
-// 1. Initialize Click Events for the Progress Tracker
+// 1. Load saved step on startup (fallback to 0 if invalid or empty)
+const savedStep = parseInt(localStorage.getItem("wizardCurrentStep"), 10);
+let currentStep = (!isNaN(savedStep) && savedStep >= 0 && savedStep < steps.length) ? savedStep : 0;
+
+// 2. Initialize Click Events for the Progress Tracker
 indicatorSteps.forEach((stepCircle, index) => {
   stepCircle.addEventListener("click", () => {
     navigateTo(index);
   });
 });
 
-// 2. Updated Navigation Function (Hides Next button on last step)
+// 3. Updated Navigation Function
 function navigateTo(index) {
   // Hide current
   steps[currentStep].classList.remove("active");
@@ -1496,6 +1499,9 @@ function navigateTo(index) {
 
   // Update Index
   currentStep = index;
+
+  // Persist current step to localStorage
+  localStorage.setItem("wizardCurrentStep", currentStep);
 
   // Show new
   steps[currentStep].classList.add("active");
@@ -1516,7 +1522,7 @@ function navigateTo(index) {
   document.querySelector('main').scrollIntoView({ behavior: 'smooth' });
 }
 
-// 3. Updated Next/Back logic
+// 4. Updated Next/Back logic
 function changeStep(n) {
   let newStep = currentStep + n;
   
@@ -1525,6 +1531,12 @@ function changeStep(n) {
     navigateTo(newStep);
   }
 }
+
+// 5. Initial rendering call to show saved active step on page load
+document.addEventListener("DOMContentLoaded", () => {
+  navigateTo(currentStep);
+});
+
 
 
 </script>
