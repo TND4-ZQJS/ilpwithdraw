@@ -248,8 +248,8 @@
 </section>
 
     </div> <!-- (END) STEP 1: Policy -->
-  
-      <!-- Policy Owner details -->
+
+  <div class="wizard-step"> <!-- Step 2: Person details -->
    <section class="section">
      <h2>Policy Owner Details</h2>
 
@@ -325,8 +325,9 @@
     </div>
 
     </section>
+  </div> 
 
-    <!-- Reason of Wtihdrawal -->
+  <div class="wizard-step"><!-- Step 3: Reason of Wtihdrawal -->
   <section class="section">
   
     <div class="row">
@@ -358,9 +359,10 @@
       <button type="button" id="addFundBtn" class="add-btn">+ Add Fund</button>
     </div>
   </section>
+  </div>
+    
 
-  <!-- Transfer to other policy -->
-  
+ <div class="wizard-step"> <!-- Step 4: Transfer to other policy -->
   <section class="section">
 
      <div class="row">
@@ -415,11 +417,11 @@
   </div>
 </div>
   
-    
-</section>
+   </section>
   </section>
+</div> 
 
-   <!-- SECTION: E Banking -->
+  <div class="wizard-step"> <!-- Step 5: E Banking -->
   <section id="UserOption" class="section">
   <h2>E Banking Details</h2>
 
@@ -472,7 +474,9 @@
       </div>
     </section>
   </section>  
+  </div>
 
+<div class="wizard-step"> <!-- Step 6: Signature -->
 <section class="section">
   <h2>Section E — Signature Details</h2>
 
@@ -576,7 +580,9 @@
       <button class="secondary" type="button" data-sig-clear>Clear Signature</button>
     </div>
   </section>
+</div>
 
+<div class="wizard-step"><!-- Step 7: Generate -->
 <section class="section">
   <div class="action-center">
     
@@ -600,7 +606,7 @@
 
   </div> <!-- Close action-center -->
 </section>
-
+</div>
 
 
 </main>
@@ -1482,6 +1488,58 @@ function resetAllData() {
   });
 
   if (typeof showSaveStatus === "function") showSaveStatus();
+}
+
+//WIZARD TRACKER LOGIC
+const steps = document.querySelectorAll(".wizard-step");
+const indicatorSteps = document.querySelectorAll(".step");
+const nextBtn = document.getElementById("nextBtn");
+const prevBtn = document.getElementById("prevBtn");
+let currentStep = 0;
+
+// 1. Initialize Click Events for the Progress Tracker
+indicatorSteps.forEach((stepCircle, index) => {
+  stepCircle.addEventListener("click", () => {
+    navigateTo(index);
+  });
+});
+
+// 2. Updated Navigation Function (Hides Next button on last step)
+function navigateTo(index) {
+  // Hide current
+  steps[currentStep].classList.remove("active");
+  indicatorSteps[currentStep].classList.remove("active");
+
+  // Update Index
+  currentStep = index;
+
+  // Show new
+  steps[currentStep].classList.add("active");
+  indicatorSteps[currentStep].classList.add("active");
+
+  // Handle "Previous" button visibility
+  prevBtn.style.visibility = (currentStep === 0) ? "hidden" : "visible";
+
+  // Handle "Next" button: Hide it completely on the final step
+  if (currentStep === steps.length - 1) {
+    nextBtn.style.display = "none";
+  } else {
+    nextBtn.style.display = "block";
+    nextBtn.innerText = "Next Step";
+  }
+
+  // Smooth scroll to top of the card
+  document.querySelector('main').scrollIntoView({ behavior: 'smooth' });
+}
+
+// 3. Updated Next/Back logic
+function changeStep(n) {
+  let newStep = currentStep + n;
+  
+  // Only navigate if the step actually exists
+  if (newStep >= 0 && newStep < steps.length) {
+    navigateTo(newStep);
+  }
 }
 
 
