@@ -31,27 +31,12 @@
   .add-btn { background: #007bff; color: white; border: none; padding: 6px 12px; cursor: pointer; border-radius: 4px; } 
 
   /* Styling for locked/copied fields */
-  input[readonly] {
-    background: #f2f2f2;
-    color: #555;
-    cursor: not-allowed;
-    border: 1px solid #ddd; 
-    outline: none;          
-    opacity: 0.8;
-  }
+  input[readonly] {background: #f2f2f2;color: #555;cursor: not-allowed;border: 1px solid #ddd; outline: none; opacity: 0.8;}
 
-   .grid-2 {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-}
-@media (max-width: 600px) {
-  .grid-2 {
-    grid-template-columns: 1fr;
-  }
-}
+  .grid-2 {display: grid;grid-template-columns: repeat(2, 1fr);gap: 12px;}
+  @media (max-width: 600px) {.grid-2 {grid-template-columns: 1fr;}}
 
-/* Generate PDF Page */
+  /* Generate PDF Page */
 .action-center {
   max-width: 800px;
   margin: 40px auto;
