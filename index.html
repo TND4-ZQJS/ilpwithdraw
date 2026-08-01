@@ -21,10 +21,10 @@
   .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:8px 0}
   .muted{color:var(--muted);font-size:0.85rem}
   button {background: var(--accent);color: #fff;border: 0;padding: 10px 16px;border-radius: 10px;cursor: pointer;font-weight: 500;font-size: 0.95rem;transition: background 0.15s;}
-button:hover {background: #0077ed;}
-button.secondary { background: #999; }
-button.ghost { background: transparent; border: 1px solid var(--line); color: #333; }
-button.ghost:hover { background: rgba(0,0,0,0.02); }
+  button:hover {background: #0077ed;}
+  button.secondary { background: #999; }
+  button.ghost { background: transparent; border: 1px solid var(--line); color: #333; }
+  button.ghost:hover { background: rgba(0,0,0,0.02); }
   .actions{display:flex;gap:12px;align-items:center}
 
   /* Styling for Fund Options*/
@@ -39,29 +39,9 @@ button.ghost:hover { background: rgba(0,0,0,0.02); }
   @media (max-width: 600px) {.grid-2 {grid-template-columns: 1fr;}}
 
   /* Generate PDF Page */
-.action-center {
-  max-width: 800px;
-  margin: 40px auto;
-  padding: 0 20px;
-  box-sizing: border-box;
-}
-
-.pdf-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.doc-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: #ffffff;
-  padding: 16px;
-  border-radius: 14px;
-  border: 1px solid #d2d2d7;
-  box-sizing: border-box;
-}
+  .action-center {max-width: 800px;margin: 40px auto;padding: 0 20px;box-sizing: border-box;}
+  .pdf-grid {display: flex;flex-direction: column;gap: 12px;}
+  .doc-row {display: flex;align-items: center;justify-content: space-between;background: #ffffff;padding: 16px;border-radius: 14px;border: 1px solid #d2d2d7box-sizing: border-box;}
 
 .doc-info {
   display: flex;
@@ -327,7 +307,7 @@ button.ghost:hover { background: rgba(0,0,0,0.02); }
     </div>
 
     </section>
-  </div> 
+  </div> <!-- (END) STEP 2: Person -->
 
   <div class="wizard-step"><!-- Step 3: Reason of Wtihdrawal -->
   <section class="section">
@@ -343,7 +323,6 @@ button.ghost:hover { background: rgba(0,0,0,0.02); }
     </label>  
     </div>  
 
-    <!-- 1. Mode Selection -->
     <div class="row">
       <label style="flex:1">Withdrawal Option:
         <select id="ILWD_WithdrawalOption" class="persist">
@@ -353,15 +332,13 @@ button.ghost:hover { background: rgba(0,0,0,0.02); }
       </label>
     </div>
 
-    <!-- 2. Dynamic Funds Container -->
     <div id="fundsContainer"></div>
 
-    <!-- 3. Add Fund Action Button -->
     <div class="row">
       <button type="button" id="addFundBtn" class="add-btn">+ Add Fund</button>
     </div>
   </section>
-  </div>
+  </div><!-- (END) STEP 3: Withdrawal -->
     
 
  <div class="wizard-step"> <!-- Step 4: Transfer to other policy -->
@@ -421,7 +398,7 @@ button.ghost:hover { background: rgba(0,0,0,0.02); }
   
    </section>
   </section>
-</div> 
+</div> <!-- (END) STEP 4: Teansfer -->
 
   <div class="wizard-step"> <!-- Step 5: E Banking -->
   <section id="UserOption" class="section">
@@ -476,7 +453,7 @@ button.ghost:hover { background: rgba(0,0,0,0.02); }
       </div>
     </section>
   </section>  
-  </div>
+  </div><!-- (END) STEP 5: E Banking -->
 
 <div class="wizard-step"> <!-- Step 6: Signature -->
 <section class="section">
@@ -582,7 +559,7 @@ button.ghost:hover { background: rgba(0,0,0,0.02); }
       <button class="secondary" type="button" data-sig-clear>Clear Signature</button>
     </div>
   </section>
-</div>
+</div><!-- (END) STEP 6: E Banking -->
 
 <div class="wizard-step"><!-- Step 7: Generate -->
 <section class="section">
@@ -608,7 +585,7 @@ button.ghost:hover { background: rgba(0,0,0,0.02); }
 
   </div> <!-- Close action-center -->
 </section>
-</div>
+</div><!-- (END) STEP 7: Generate -->
 
   <!-- NAVIGATION BUTTONS -->
     <div class="wizard-actions">
