@@ -175,8 +175,7 @@
 /* Navigation Footer */
 .wizard-actions {display: flex;justify-content: space-between;margin-top: 30px;padding: 20px 0;border-top: 1px solid var(--line);}
 
-
-  /* Signature preview tiles */
+/* Signature preview tiles */
   .sig-preview{
     width:100%; height:150px; border:1px dashed #bbb; border-radius:10px;
     display:flex; align-items:center; justify-content:center; background:#fff; cursor:pointer; position:relative;
@@ -205,9 +204,40 @@
 </style>
 </head>
 <body>
-<main>
-  <h1>Investment-linked Partial Withdrawal Form</h1>
+  <!-- Global Navigation Header -->
+    <header class="navbar">
+        <div class="nav-container">
+            <span class="logo" onclick="window.location.href='dashboard.html'">CI Pro Universe</span>
 
+            <!-- JavaScript Mobile Opener Hook -->
+            <div class="menu-toggle" onclick="toggleMobileMenu()" aria-label="Toggle menu">
+                <span></span><span></span><span></span>
+            </div>
+
+            <nav class="nav-menu" id="navMenu">
+                <a href="dashboard.html" class="nav-item">Operational Hub</a>
+                <a href="cipro-experience.html" class="nav-item">CI Pro Experience</a>
+                <a href="eposbuddy.html" class="nav-item">EPOS Buddy</a>
+                <a href="magicfiller.html" class="nav-item active">Magic Filler</a>
+            </nav>
+        </div>
+    </header>  
+
+    <!-- Back Button -->
+    <div class="back-navigation-container">
+    <a href="#" id="backToMainLink" class="back-link" aria-label="Go back to previous page" role="button">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+        <span>Back</span>
+    </a>
+</div>
+    
+<main class="container">
+   <section class="hero" style="padding-top: 0px; padding-bottom: 20px; text-align: left;">
+            <span class="badge">Investment-linked Partial Withdrawal Form</span>
+    </section>
+  
   <!-- Progress Tracker -->
   <div class="step-indicator" id="stepIndicator">
     <div class="step active"><span class="step-num">1</span>Policy</div>
@@ -600,8 +630,19 @@
       <button type="button" id="prevBtn" class="ghost" onclick="changeStep(-1)" style="visibility:hidden;">Previous</button>
       <button type="button" id="nextBtn" onclick="changeStep(1)">Next Step</button>
     </div>
+
+  <!-- Security Statement -->
+      <section class="security" style="padding: 0 0 60px 0;">
+            <div class="security-box">
+                <strong>Secured Session Active:</strong> This platform operates on a static, local-injection framework. We do not store, log, or track any personal details or financial credentials on external servers.
+            </div>
+    </section>  
   
 </main>
+
+    <footer class="footer">
+        &copy; 2026 CI Pro Universe Portal. All rights reserved. Built for CI Pro operations.
+    </footer>    
 
 <!-- Signature Modal -->
 <div id="sigModal" class="sig-modal" aria-hidden="true">
@@ -1548,6 +1589,25 @@ document.addEventListener("DOMContentLoaded", () => {
   navigateTo(currentStep);
 });
 
+// iOS-Style Back Navigation Interceptor
+const backToMainLink = document.getElementById("backToMainLink");
+if (backToMainLink) {
+  backToMainLink.addEventListener("click", function(e) {
+    e.preventDefault();
+    if (document.referrer && document.referrer.includes(window.location.hostname)) {
+      window.history.back();
+    } else {
+      window.location.href = "dashboard.html";
+    }
+  });
+}  
+// (END) iOS-Style Back Navigation Interceptor
+    
+// Top Navigator Menu logic
+function toggleMobileMenu() {
+  const navMenu = document.getElementById('navMenu');
+  if (navMenu) navMenu.classList.toggle('show');
+}  
 
 </script>
 </body>
