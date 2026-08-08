@@ -1401,7 +1401,7 @@ async function fillPDF(templateFileName, action = 'download') {
     safeSetText(form, "ILWD_Trf_TopUp_Amt", getValue("ILWD_Trf_TopUp_Amt"));
     safeSetText(form, "ILWD_Trf_Loan_Amt", getValue("ILWD_Trf_Loan_Amt"));
     safeSetText(form, "ILWD_Trf_APL_Amt", getValue("ILWD_Trf_APL_Amt"));
-    safeCheck(form, "LWD_Trf_FYPNewB", getChecked("LWD_Trf_FYPNewB"));
+    safeCheck(form, "LWD_Trf_FYPNewB", getChecked("ILWD_Trf_FYPNewB"));
     safeCheck(form, "ILWD_Trf_TopUp", getChecked("ILWD_Trf_TopUp"));
     safeCheck(form, "ILWD_Trf_Loan", getChecked("ILWD_Trf_Loan"));
     safeCheck(form, "ILWD_Trf_APL", getChecked("ILWD_Trf_APL"));
