@@ -1341,7 +1341,6 @@ async function fillPDF(templateFileName, action = 'download') {
     safeSetText(form, "ILWD_EBank_NIRC", getValue("ILWD_EBank_NIRC"));
     safeCheck(form, "ILWD_EBank_Conventional", getChecked("ILWD_EBank_Conventional"));
     safeCheck(form, "ILWD_EBank_Islamic", getChecked("ILWD_EBank_Islamic"));
-    safeCheck(form, "ILWD_EBank_Checkbox", getChecked("ILWD_EBank_Checkbox"));
 
     // Section C - Signing Details 
     safeSetText(form, "ILWD_Signed_State", getValue("ILWD_Signed_State"));
