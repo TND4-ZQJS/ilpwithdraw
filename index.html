@@ -661,25 +661,40 @@ const FUND_LIST = [
 ];
 
 const DEFAULT_FUND_KEY = "Equity";
-const modeSelect = $("ILWD_WithdrawalOption");
-const container = $("fundsContainer");
-const addBtn = $("addFundBtn");
-
 const STORAGE_KEY_MODE = 'ILWD_WithdrawalOption_Saved';
 const STORAGE_KEY_FUNDS = 'ILWD_WithdrawalFunds_Saved';
 
 let selectedFundKeys = new Set();
 
+function getModeSelect() {
+  return typeof $ === 'function' ? $("ILWD_WithdrawalOption") : document.getElementById("ILWD_WithdrawalOption");
+}
+
+function getContainer() {
+  return typeof $ === 'function' ? $("fundsContainer") : document.getElementById("fundsContainer");
+}
+
 function saveToLocalStorage() {
-  localStorage.setItem(STORAGE_KEY_MODE, modeSelect.value);
+  const modeSelect = getModeSelect();
+  const container = getContainer();
+  if (!container || !modeSelect) return;
+
+  if (modeSelect.value) {
+    localStorage.setItem(STORAGE_KEY_MODE, modeSelect.value);
+  }
+
   const rowsData = [];
   container.querySelectorAll('.fund-item').forEach(row => {
     const select = row.querySelector('.fund-select');
     const input = row.querySelector('.fund-input');
     if (select && select.value) {
-      rowsData.push({ fundKey: select.value, val: input ? input.value : '' });
+      rowsData.push({ 
+        fundKey: select.value, 
+        val: input ? input.value : '' 
+      });
     }
   });
+
   localStorage.setItem(STORAGE_KEY_FUNDS, JSON.stringify(rowsData));
   if (typeof showSaveStatus === 'function') {
     showSaveStatus();
@@ -687,13 +702,17 @@ function saveToLocalStorage() {
 }
 
 function createFundRow(initialFundKey = null, initialVal = '') {
+  const modeSelect = getModeSelect();
+  const container = getContainer();
+  if (!container) return;
+
   const availableFunds = FUND_LIST.filter(f => !selectedFundKeys.has(f.key));
   if (!initialFundKey && availableFunds.length === 0) {
     alert("All available funds have been added.");
     return;
   }
 
-  const mode = modeSelect.value;
+  const mode = modeSelect ? modeSelect.value : 'Amount';
   const row = document.createElement('div');
   row.className = 'row fund-item';
 
@@ -707,7 +726,8 @@ function createFundRow(initialFundKey = null, initialVal = '') {
   input.placeholder = mode === 'Amount' ? 'Amount (RM)' : 'Units';
   input.className = 'fund-input';
   input.style.flex = '1';
-  input.value = initialVal; // Set initial value directly
+  input.setAttribute('autocomplete', 'off'); // Prevents browser autofill/clear behavior
+  input.value = initialVal !== undefined && initialVal !== null ? initialVal : '';
 
   const removeBtn = document.createElement('button');
   removeBtn.type = 'button';
@@ -728,9 +748,9 @@ function createFundRow(initialFundKey = null, initialVal = '') {
     saveToLocalStorage();
   });
 
-  // Listen to both input and change events to ensure immediate saving
   input.addEventListener('input', saveToLocalStorage);
   input.addEventListener('change', saveToLocalStorage);
+  input.addEventListener('keyup', saveToLocalStorage);
 
   removeBtn.addEventListener('click', () => {
     selectedFundKeys.delete(select.dataset.selectedKey);
@@ -746,9 +766,15 @@ function createFundRow(initialFundKey = null, initialVal = '') {
 
   updateAllDropdowns();
   select.value = currentKey;
+  
+  // Re-apply value after appending to DOM
+  input.value = initialVal !== undefined && initialVal !== null ? initialVal : '';
 }
 
 function updateAllDropdowns() {
+  const container = getContainer();
+  if (!container) return;
+
   container.querySelectorAll('.fund-item').forEach(row => {
     const select = row.querySelector('.fund-select');
     if (!select) return;
@@ -767,21 +793,16 @@ function updateAllDropdowns() {
   });
 }
 
-modeSelect.addEventListener('change', () => {
-  const mode = modeSelect.value;
-  container.querySelectorAll('.fund-input').forEach(input => {
-    input.placeholder = mode === 'Amount' ? 'Amount (RM)' : 'Units';
-  });
-  saveToLocalStorage();
-});
-
 function loadFromLocalStorage() {
-  // Reset existing rows
+  const container = getContainer();
+  const modeSelect = getModeSelect();
+  if (!container) return;
+
   container.innerHTML = '';
   selectedFundKeys.clear();
 
   const savedMode = localStorage.getItem(STORAGE_KEY_MODE);
-  if (savedMode) modeSelect.value = savedMode;
+  if (savedMode && modeSelect) modeSelect.value = savedMode;
 
   const savedFundsRaw = localStorage.getItem(STORAGE_KEY_FUNDS);
   if (savedFundsRaw) {
@@ -791,40 +812,41 @@ function loadFromLocalStorage() {
         savedFunds.forEach(item => createFundRow(item.fundKey, item.val));
         return;
       }
-    } catch (e) { 
-      console.error("Failed to parse saved funds:", e); 
+    } catch (e) {
+      console.error(e);
     }
   }
   createFundRow();
 }
 
-addBtn.addEventListener('click', () => {
-  createFundRow();
-  saveToLocalStorage();
-});
+// Bind load logic to window load to guarantee execution after frame initialization
+window.addEventListener('load', () => {
+  const modeSelect = getModeSelect();
+  const addBtn = typeof $ === 'function' ? $("addFundBtn") : document.getElementById("addFundBtn");
 
-function getPdfFormData() {
-  const mode = modeSelect.value;
-  const pdfData = {};
-  container.querySelectorAll('.fund-item').forEach(row => {
-    const select = row.querySelector('.fund-select');
-    const val = row.querySelector('.fund-input').value;
-    if (select && select.value && val) {
-      const fundConfig = FUND_LIST.find(f => f.key === select.value);
-      if (fundConfig) {
-        pdfData[mode === 'Amount' ? fundConfig.amtId : fundConfig.unitId] = val;
+  if (modeSelect) {
+    modeSelect.addEventListener('change', () => {
+      const mode = modeSelect.value;
+      const container = getContainer();
+      if (container) {
+        container.querySelectorAll('.fund-input').forEach(input => {
+          input.placeholder = mode === 'Amount' ? 'Amount (RM)' : 'Units';
+        });
       }
-    }
-  });
-  return pdfData;
-}
+      saveToLocalStorage();
+    });
+  }
 
-// CRITICAL FIX: Run loadFromLocalStorage when the DOM is fully loaded
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', loadFromLocalStorage);
-} else {
+  if (addBtn) {
+    addBtn.addEventListener('click', () => {
+      createFundRow();
+      saveToLocalStorage();
+    });
+  }
+
+  // Load saved state
   loadFromLocalStorage();
-}
+});
 
 /* ---------- Combined PO -> E-Bank & PO -> Insured Sync Helper ---------- */
 document.addEventListener("DOMContentLoaded", () => {
