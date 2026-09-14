@@ -702,7 +702,6 @@ function createFundRow(initialFundKey = null, initialVal = '') {
   const input = document.createElement('input');
   input.type = 'number';
   input.step = 'any';
-  input.value = initialVal;
   input.placeholder = mode === 'Amount' ? 'Amount (RM)' : 'Units';
   input.className = 'fund-input';
   input.style.flex = '1';
@@ -740,10 +739,14 @@ function createFundRow(initialFundKey = null, initialVal = '') {
   row.appendChild(removeBtn);
   container.appendChild(row);
 
+  // 1. First update the options in the DOM
   updateAllDropdowns();
+  
+  // 2. Set the values explicitly AFTER DOM elements are ready
   select.value = currentKey;
+  input.value = initialVal; // Set input value here
 }
-
+  
 function updateAllDropdowns() {
   container.querySelectorAll('.fund-item').forEach(row => {
     const select = row.querySelector('.fund-select');
