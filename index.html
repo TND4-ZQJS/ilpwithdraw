@@ -675,13 +675,15 @@ function saveToLocalStorage() {
   const rowsData = [];
   container.querySelectorAll('.fund-item').forEach(row => {
     const select = row.querySelector('.fund-select');
-    const val = row.querySelector('.fund-input').value;
+    const input = row.querySelector('.fund-input');
     if (select && select.value) {
-      rowsData.push({ fundKey: select.value, val });
+      rowsData.push({ fundKey: select.value, val: input ? input.value : '' });
     }
   });
   localStorage.setItem(STORAGE_KEY_FUNDS, JSON.stringify(rowsData));
-  showSaveStatus();
+  if (typeof showSaveStatus === 'function') {
+    showSaveStatus();
+  }
 }
 
 function createFundRow(initialFundKey = null, initialVal = '') {
@@ -705,6 +707,7 @@ function createFundRow(initialFundKey = null, initialVal = '') {
   input.placeholder = mode === 'Amount' ? 'Amount (RM)' : 'Units';
   input.className = 'fund-input';
   input.style.flex = '1';
+  input.value = initialVal; // Set initial value directly
 
   const removeBtn = document.createElement('button');
   removeBtn.type = 'button';
@@ -725,7 +728,9 @@ function createFundRow(initialFundKey = null, initialVal = '') {
     saveToLocalStorage();
   });
 
+  // Listen to both input and change events to ensure immediate saving
   input.addEventListener('input', saveToLocalStorage);
+  input.addEventListener('change', saveToLocalStorage);
 
   removeBtn.addEventListener('click', () => {
     selectedFundKeys.delete(select.dataset.selectedKey);
@@ -739,14 +744,10 @@ function createFundRow(initialFundKey = null, initialVal = '') {
   row.appendChild(removeBtn);
   container.appendChild(row);
 
-  // 1. First update the options in the DOM
   updateAllDropdowns();
-  
-  // 2. Set the values explicitly AFTER DOM elements are ready
   select.value = currentKey;
-  input.value = initialVal; // Set input value here
 }
-  
+
 function updateAllDropdowns() {
   container.querySelectorAll('.fund-item').forEach(row => {
     const select = row.querySelector('.fund-select');
@@ -775,6 +776,10 @@ modeSelect.addEventListener('change', () => {
 });
 
 function loadFromLocalStorage() {
+  // Reset existing rows
+  container.innerHTML = '';
+  selectedFundKeys.clear();
+
   const savedMode = localStorage.getItem(STORAGE_KEY_MODE);
   if (savedMode) modeSelect.value = savedMode;
 
@@ -786,7 +791,9 @@ function loadFromLocalStorage() {
         savedFunds.forEach(item => createFundRow(item.fundKey, item.val));
         return;
       }
-    } catch (e) { console.error(e); }
+    } catch (e) { 
+      console.error("Failed to parse saved funds:", e); 
+    }
   }
   createFundRow();
 }
@@ -810,6 +817,13 @@ function getPdfFormData() {
     }
   });
   return pdfData;
+}
+
+// CRITICAL FIX: Run loadFromLocalStorage when the DOM is fully loaded
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', loadFromLocalStorage);
+} else {
+  loadFromLocalStorage();
 }
 
 /* ---------- Combined PO -> E-Bank & PO -> Insured Sync Helper ---------- */
